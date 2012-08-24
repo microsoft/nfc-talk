@@ -1,0 +1,12 @@
+﻿<local:DataContext
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"       
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:NFCTalk">
+
+    <local:DataContext.Messages>
+        <local:Message Name="Jack Bauer" Text="Hello there!" Direction="Out" Archived="True"/>
+        <local:Message Name="Lisa Simpson" Text="Oh hello!" Direction="In" Archived="True"/>
+        <local:Message Name="Jack Bauer" Text="So this is how NFC works!" Direction="Out" Archived="False"/>
+        <local:Message Name="Lisa Simpson" Text="Yeah! You just tap and go! Lorem ipsum, lipsum lipsum!" Direction="In" Archived="False"/>
+    </local:DataContext.Messages>
+</local:DataContext>
