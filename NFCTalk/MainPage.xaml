@@ -30,6 +30,7 @@
         <!--ContentPanel - place additional content here-->
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Tap="ConnectGuide_Tap">
+                <Image Source="Assets/nfc_connect.png" Height="300" Width="300"/>
                 <TextBlock Text="{Binding Path=Settings.Name, StringFormat='Your name is set to \{0\}.'}"
                            HorizontalAlignment="Center"/>
                 <TextBlock Text="Tap other device to connect." HorizontalAlignment="Center"/>

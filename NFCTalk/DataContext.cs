@@ -70,5 +70,17 @@ namespace NFCTalk
                 return _messages;
             }
         }
+
+        Communication _communication = null;
+        public Communication Communication
+        {
+            get
+            {
+                if (_communication == null)
+                    _communication = new Communication();
+
+                return _communication;
+            }
+        }
     }
 }

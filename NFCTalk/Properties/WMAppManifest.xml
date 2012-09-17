@@ -26,16 +26,14 @@
           </BackBackgroundImageURI>
           <BackTitle>
           </BackTitle>
-          <LargeBackgroundImageURI>
-          </LargeBackgroundImageURI>
+          <LargeBackgroundImageURI IsRelative="true" IsResource="false">Assets\Tiles\FlipCycleTileLarge.png</LargeBackgroundImageURI>
           <LargeBackContent>
           </LargeBackContent>
           <LargeBackBackgroundImageURI>
           </LargeBackBackgroundImageURI>
           <DeviceLockImageURI>
           </DeviceLockImageURI>
-          <HasLarge>
-          </HasLarge>
+          <HasLarge>True</HasLarge>
         </TemplateFlip>
       </PrimaryToken>
     </Tokens>

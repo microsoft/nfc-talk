@@ -37,8 +37,19 @@ namespace NFCTalk
             {
                 NavigationService.Navigate(new Uri("/SettingsPage.xaml", UriKind.Relative));
             }
+            else
+            {
+                _dataContext.Communication.Connect();
+            }
 
             base.OnNavigatedTo(e);
+        }
+
+        protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
+        {
+            _dataContext.Communication.Disconnect();
+
+            base.OnNavigatingFrom(e);
         }
 
         private void settingsButton_Click(object sender, EventArgs e)
