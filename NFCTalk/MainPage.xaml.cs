@@ -19,14 +19,19 @@ namespace NFCTalk
     public partial class MainPage : PhoneApplicationPage
     {
         NFCTalk.DataContext _dataContext = NFCTalk.DataContext.Singleton();
+        ApplicationBarIconButton _settingsButton;
+        ProgressIndicator _progressIndicator = new ProgressIndicator();
 
-        // Constructor
         public MainPage()
         {
             InitializeComponent();
 
             DataContext = _dataContext;
 
+            _settingsButton = ApplicationBar.Buttons[0] as ApplicationBarIconButton;
+
+            _progressIndicator.IsIndeterminate = true;
+            
             ///Sample code to call helper function to localize the ApplicationBar
             //BuildApplicationBar();
         }
@@ -39,7 +44,12 @@ namespace NFCTalk
             }
             else
             {
+                _dataContext.Communication.Connected += Connected;
+                _dataContext.Communication.Connecting += Connecting;
+                _dataContext.Communication.ConnectionInterrupted += ConnectionInterrupted;
                 _dataContext.Communication.Connect();
+
+                _settingsButton.IsEnabled = true;
             }
 
             base.OnNavigatedTo(e);
@@ -47,7 +57,7 @@ namespace NFCTalk
 
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
         {
-            _dataContext.Communication.Disconnect();
+            _dataContext.Communication.Connected -= Connected;
 
             base.OnNavigatingFrom(e);
         }
@@ -57,9 +67,52 @@ namespace NFCTalk
             NavigationService.Navigate(new Uri("/SettingsPage.xaml", UriKind.Relative));
         }
 
-        private void ConnectGuide_Tap(object sender, GestureEventArgs e)
+        private void Connected()
         {
-            NavigationService.Navigate(new Uri("/TalkPage.xaml", UriKind.Relative));
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
+                HideProgress();
+
+                NavigationService.Navigate(new Uri("/TalkPage.xaml", UriKind.Relative));
+            });
+        }
+
+        private void Connecting()
+        {
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
+                ShowProgress("Connecting...");
+
+                _settingsButton.IsEnabled = false;
+            });
+        }
+
+        private void ConnectionInterrupted()
+        {
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
+                HideProgress();
+
+                _dataContext.Communication.Disconnect();
+                _dataContext.Communication.Connect();
+
+                _settingsButton.IsEnabled = true;
+            });
+        }
+
+        private void ShowProgress(String msg)
+        {
+            _progressIndicator.Text = msg;
+            _progressIndicator.IsVisible = true;
+
+            SystemTray.SetProgressIndicator(this, _progressIndicator);
+        }
+
+        private void HideProgress()
+        {
+            _progressIndicator.IsVisible = false;
+
+            SystemTray.SetProgressIndicator(this, _progressIndicator);
         }
 
         // Sample code for building a localized ApplicationBar

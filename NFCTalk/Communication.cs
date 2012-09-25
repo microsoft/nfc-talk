@@ -1,15 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using Windows.Networking.Proximity;
 using Windows.Networking.Sockets;
+using Windows.Storage.Streams;
 
 namespace NFCTalk
 {
-    class Communication
+    class Communication : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public Action Connecting;
+        public Action Connected;
+        public Action ConnectionInterrupted;
+        public Action<Message> MessageReceived;
+
         enum ConnectionStatusValue
         {
             NotConnected = 0,
@@ -21,12 +32,38 @@ namespace NFCTalk
 
         ConnectionStatusValue _status;
         StreamSocket _socket;
+        DataWriter _writer;
+        DataReader _reader;
+        string _name;
+
+        public string PeerName
+        {
+            get
+            {
+                return _name;
+            }
+
+            set
+            {
+                if (_name != value)
+                {
+                    _name = value;
+
+                    if (PropertyChanged != null)
+                    {
+                        PropertyChanged(this, new PropertyChangedEventArgs("PeerName"));
+                    }
+                }
+            }
+        }
 
         public void Connect()
         {
             if (_status == ConnectionStatusValue.NotConnected)
             {
-                //PeerFinder.DisplayName = NFCTalk.DataContext.Singleton().Settings.Name;
+                PeerName = "";
+
+                PeerFinder.DisplayName = NFCTalk.DataContext.Singleton().Settings.Name;
                 PeerFinder.TriggeredConnectionStateChanged += TriggeredConnectionStateChanged;
                 //PeerFinder.ConnectionRequested += ConnectionRequested;
 
@@ -63,24 +100,154 @@ namespace NFCTalk
         {
             switch (e.State)
             {
-                case TriggeredConnectState.PeerFound:
-                    // tap gesture is complete
+                case TriggeredConnectState.PeerFound: System.Diagnostics.Debug.WriteLine("PeerFound");
+                    if (Connecting != null)
+                    {
+                        Connecting();
+                    }
                     break;
 
-                case TriggeredConnectState.Connecting:
+                case TriggeredConnectState.Connecting: System.Diagnostics.Debug.WriteLine("Connecting");
                     _status = ConnectionStatusValue.Connecting;
                     break;
 
-                case TriggeredConnectState.Listening:
+                case TriggeredConnectState.Listening: System.Diagnostics.Debug.WriteLine("Listening");
                     _status = ConnectionStatusValue.Listening;
                     break;
 
-                case TriggeredConnectState.Completed:
+                case TriggeredConnectState.Completed: System.Diagnostics.Debug.WriteLine("Completed");
                     PeerFinder.Stop();
                     PeerFinder.TriggeredConnectionStateChanged -= TriggeredConnectionStateChanged;
                     _socket = e.Socket;
+                    _writer = new DataWriter(e.Socket.OutputStream);
+                    _reader = new DataReader(e.Socket.InputStream);
                     _status = ConnectionStatusValue.Connected;
+
+                    ListenAsync();
+
+                    SendName(NFCTalk.DataContext.Singleton().Settings.Name);
+
+                    if (Connected != null)
+                    {
+                        Connected();
+                    }
                     break;
+
+                case TriggeredConnectState.Canceled: System.Diagnostics.Debug.WriteLine("Canceled");
+                    if (ConnectionInterrupted != null)
+                    {
+                        ConnectionInterrupted();
+                    }
+                    break;
+
+                case TriggeredConnectState.Failed: System.Diagnostics.Debug.WriteLine("Failed");
+                    if (ConnectionInterrupted != null)
+                    {
+                        ConnectionInterrupted();
+                    }
+                    break;
+            }
+        }
+
+        public async void SendName(string name)
+        {
+            _writer.WriteUInt32(0);
+
+            uint length = _writer.MeasureString(name);
+            _writer.WriteUInt32(length);
+            _writer.WriteString(name);
+
+            await _writer.StoreAsync();
+        }
+
+        public async void SendMessage(Message m)
+        {
+            if (m.Text.Length > 0)
+            {
+                uint length;
+
+                _writer.WriteUInt32(1);
+
+                length = _writer.MeasureString(m.Text);
+                _writer.WriteUInt32(length);
+                _writer.WriteString(m.Text);
+
+                await _writer.StoreAsync();
+            }
+        }
+
+        private async Task GuaranteedLoadAsync(uint length)
+        {
+            DataReaderLoadOperation op;
+
+            while (length != _reader.UnconsumedBufferLength)
+            {
+                op = _reader.LoadAsync(length - _reader.UnconsumedBufferLength);
+
+                if (await op.AsTask<uint>() == 0)
+                {
+                    throw new Exception();
+                }
+            }
+        }
+
+        private async void ListenAsync()
+        {
+            try
+            {
+                while (true)
+                {
+                    await GuaranteedLoadAsync(sizeof(UInt32));
+                    uint code = _reader.ReadUInt32();
+
+                    switch (code)
+                    {
+                        case 0: // name
+                            {
+                                await GuaranteedLoadAsync(sizeof(UInt32));
+                                uint length = _reader.ReadUInt32();
+                                await GuaranteedLoadAsync(length);
+                                string name = _reader.ReadString(length);
+
+                                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                                {
+                                    PeerName = name;
+                                });
+                            }
+                            break;
+
+                        case 1: // message
+                            {
+                                uint length;
+
+                                await GuaranteedLoadAsync(sizeof(UInt32));
+                                length = _reader.ReadUInt32();
+
+                                await GuaranteedLoadAsync(length);
+                                string text = _reader.ReadString(length);
+
+                                Message m = new Message()
+                                {
+                                    Name = _name,
+                                    Text = text,
+                                    Direction = Message.DirectionValue.In
+                                };
+
+                                if (MessageReceived != null)
+                                {
+                                    MessageReceived(m);
+                                }
+                            }
+                            break;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                if (ConnectionInterrupted != null)
+                {
+                    ConnectionInterrupted();
+                }
             }
         }
 
@@ -94,13 +261,5 @@ namespace NFCTalk
         //            break;
         //    }
         //}
-
-        //public int SendMessage(Message m);
-
-        // event OnReceivedMessage(Message m);
-        // event OnConnected();
-        // event OnDisconnected();
-        // event OnSendMessageComplete(int id);
-        // event OnSendMessageFailed(int id);
     }
 }
