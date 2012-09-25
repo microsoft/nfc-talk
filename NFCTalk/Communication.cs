@@ -156,28 +156,48 @@ namespace NFCTalk
         
         async Task SendNameAsync(string name)
         {
-            _writer.WriteUInt32(0);
+            try
+            {
+                _writer.WriteUInt32(0);
 
-            uint length = _writer.MeasureString(name);
-            _writer.WriteUInt32(length);
-            _writer.WriteString(name);
+                uint length = _writer.MeasureString(name);
+                _writer.WriteUInt32(length);
+                _writer.WriteString(name);
 
-            await _writer.StoreAsync();
+                await _writer.StoreAsync();
+            }
+            catch (Exception)
+            {
+                if (ConnectionInterrupted != null)
+                {
+                    ConnectionInterrupted();
+                }
+            }
         }
 
         public async Task SendMessageAsync(Message m)
         {
-            if (m.Text.Length > 0)
+            try
             {
-                uint length;
+                if (m.Text.Length > 0)
+                {
+                    uint length;
 
-                _writer.WriteUInt32(1);
+                    _writer.WriteUInt32(1);
 
-                length = _writer.MeasureString(m.Text);
-                _writer.WriteUInt32(length);
-                _writer.WriteString(m.Text);
+                    length = _writer.MeasureString(m.Text);
+                    _writer.WriteUInt32(length);
+                    _writer.WriteString(m.Text);
 
-                await _writer.StoreAsync();
+                    await _writer.StoreAsync();
+                }
+            }
+            catch (Exception)
+            {
+                if (ConnectionInterrupted != null)
+                {
+                    ConnectionInterrupted();
+                }
             }
         }
 
