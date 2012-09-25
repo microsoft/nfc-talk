@@ -26,14 +26,16 @@ namespace NFCTalk
         {
             InitializeComponent();
 
+            ApplicationBarMenuItem menuItem = new ApplicationBarMenuItem();
+            menuItem.Text = "about";
+            ApplicationBar.MenuItems.Add(menuItem);
+            menuItem.Click += new EventHandler(aboutMenuItem_Click);
+
             DataContext = _dataContext;
 
             _settingsButton = ApplicationBar.Buttons[0] as ApplicationBarIconButton;
 
             _progressIndicator.IsIndeterminate = true;
-            
-            ///Sample code to call helper function to localize the ApplicationBar
-            //BuildApplicationBar();
         }
 
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
@@ -58,13 +60,10 @@ namespace NFCTalk
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
         {
             _dataContext.Communication.Connected -= Connected;
+            _dataContext.Communication.Connecting -= Connecting;
+            _dataContext.Communication.ConnectionInterrupted -= ConnectionInterrupted;
 
             base.OnNavigatingFrom(e);
-        }
-
-        private void settingsButton_Click(object sender, EventArgs e)
-        {
-            NavigationService.Navigate(new Uri("/SettingsPage.xaml", UriKind.Relative));
         }
 
         private void Connected()
@@ -115,20 +114,18 @@ namespace NFCTalk
             SystemTray.SetProgressIndicator(this, _progressIndicator);
         }
 
-        // Sample code for building a localized ApplicationBar
-        //private void BuildApplicationBar()
-        //{
-        //    // Set the page's ApplicationBar to a new instance of ApplicationBar.
-        //    ApplicationBar = new ApplicationBar();
+        private void settingsButton_Click(object sender, EventArgs e)
+        {
+            _dataContext.Communication.Disconnect();
 
-        //    // Create a new button and set the text value to the localized string from AppResources.
-        //    ApplicationBarIconButton appBarButton = new ApplicationBarIconButton(new Uri("/Images/appbar_button1.png", UriKind.Relative));
-        //    appBarButton.Text = AppResources.appbar_buttonText;
-        //    ApplicationBar.Buttons.Add(appBarButton);
+            NavigationService.Navigate(new Uri("/SettingsPage.xaml", UriKind.Relative));
+        }
 
-        //    // Create a new menu item with the localized string from AppResources.
-        //    ApplicationBarMenuItem appBarMenuItem = new ApplicationBarMenuItem(AppResources.appbar_menuItemText);
-        //    ApplicationBar.MenuItems.Add(appBarMenuItem);
-        //}
+        private void aboutMenuItem_Click(object sender, EventArgs e)
+        {
+            _dataContext.Communication.Disconnect();
+
+            NavigationService.Navigate(new Uri("/AboutPage.xaml", UriKind.Relative));
+        }
     }
 }

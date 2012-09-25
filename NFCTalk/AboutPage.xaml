@@ -1,0 +1,41 @@
+﻿<phone:PhoneApplicationPage
+    x:Class="NFCTalk.AboutPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    SupportedOrientations="Portrait" Orientation="Portrait"
+    mc:Ignorable="d"
+    shell:SystemTray.IsVisible="True">
+
+    <Grid x:Name="LayoutRoot" Background="Transparent">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="12,17,0,28">
+            <TextBlock Text="NFC TALK" Style="{StaticResource PhoneTextNormalStyle}"/>
+            <TextBlock Text="about" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Margin="12,0,12,0">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Margin="12,0,12,0" Text="Version"/>
+                <TextBlock x:Name="versionTextBox" Margin="12,0,12,0" Text="Version"/>
+            </StackPanel>
+            <TextBlock Margin="12,10,12,0" Text="NFC Talk application is a Nokia Developer example demonstrating tap based connection initiation with Windows Phone 8 Proximity API." TextWrapping="Wrap"/>
+            <TextBlock Margin="12,10,12,0" Text="Developed and published by Nokia. All rights reserved." TextWrapping="Wrap"/>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Margin="12,10,0,0" Text="Learn more at"/>
+                <HyperlinkButton Margin="-9,8,12,0" NavigateUri="http://projects.developer.nokia.com/cameraexplorer" Content="developer.nokia.com"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+
+</phone:PhoneApplicationPage>
