@@ -54,6 +54,8 @@ namespace NFCTalk
             _dataContext.Communication.ConnectionInterrupted -= ConnectionInterrupted;
             _dataContext.Communication.MessageReceived -= MessageReceived;
 
+            _dataContext.Messages.CollectionChanged -= MessagesChanged;
+
             _dataContext.Communication.Disconnect();
 
             foreach (Message m in _dataContext.Messages)

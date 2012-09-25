@@ -18,6 +18,7 @@ namespace NFCTalk
 
         public Action Connecting;
         public Action Connected;
+        public Action UnableToConnect;
         public Action ConnectionInterrupted;
         public Action<Message> MessageReceived;
 
@@ -70,6 +71,10 @@ namespace NFCTalk
                 _status = ConnectionStatusValue.Searching;
 
                 PeerFinder.Start();
+            }
+            else
+            {
+                throw new Exception("Bad state, please disconnect first");
             }
         }
 
@@ -134,16 +139,16 @@ namespace NFCTalk
                     break;
 
                 case TriggeredConnectState.Canceled: System.Diagnostics.Debug.WriteLine("Canceled");
-                    if (ConnectionInterrupted != null)
+                    if (UnableToConnect != null)
                     {
-                        ConnectionInterrupted();
+                        UnableToConnect();
                     }
                     break;
 
                 case TriggeredConnectState.Failed: System.Diagnostics.Debug.WriteLine("Failed");
-                    if (ConnectionInterrupted != null)
+                    if (UnableToConnect != null)
                     {
-                        ConnectionInterrupted();
+                        UnableToConnect();
                     }
                     break;
             }

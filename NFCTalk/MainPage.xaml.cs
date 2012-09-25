@@ -13,6 +13,7 @@ using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using NFCTalk.Resources;
+using Microsoft.Phone.Tasks;
 
 namespace NFCTalk
 {
@@ -49,6 +50,7 @@ namespace NFCTalk
                 _dataContext.Communication.Connected += Connected;
                 _dataContext.Communication.Connecting += Connecting;
                 _dataContext.Communication.ConnectionInterrupted += ConnectionInterrupted;
+                _dataContext.Communication.UnableToConnect += UnableToConnect;
                 _dataContext.Communication.Connect();
 
                 _settingsButton.IsEnabled = true;
@@ -62,6 +64,7 @@ namespace NFCTalk
             _dataContext.Communication.Connected -= Connected;
             _dataContext.Communication.Connecting -= Connecting;
             _dataContext.Communication.ConnectionInterrupted -= ConnectionInterrupted;
+            _dataContext.Communication.UnableToConnect -= UnableToConnect;
 
             base.OnNavigatingFrom(e);
         }
@@ -88,14 +91,37 @@ namespace NFCTalk
 
         private void ConnectionInterrupted()
         {
+            _dataContext.Communication.Disconnect();
+            _dataContext.Communication.Connect();
+
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
                 HideProgress();
 
-                _dataContext.Communication.Disconnect();
-                _dataContext.Communication.Connect();
-
                 _settingsButton.IsEnabled = true;
+            });
+        }
+
+        private void UnableToConnect()
+        {
+            _dataContext.Communication.Disconnect();
+
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
+                HideProgress();
+
+                MessageBoxResult r = MessageBox.Show("Please make sure that Bluetooth has been turned on.", "Unable to connect", MessageBoxButton.OKCancel);
+
+                if (r.HasFlag(MessageBoxResult.OK))
+                {
+                    ConnectionSettingsTask connectionSettingsTask = new ConnectionSettingsTask();
+                    connectionSettingsTask.ConnectionSettingsType = ConnectionSettingsType.Bluetooth;
+                    connectionSettingsTask.Show();
+                }
+                else
+                {
+                    _dataContext.Communication.Connect();
+                }
             });
         }
 
