@@ -17,7 +17,7 @@ namespace NFCTalk
 {
     public partial class SettingsPage : PhoneApplicationPage
     {
-        NFCTalk.DataContext _dataContext = NFCTalk.DataContext.Singleton();
+        NFCTalk.DataContext _dataContext = NFCTalk.DataContext.Singleton;
 
         ApplicationBarIconButton _saveButton;
         ApplicationBarIconButton _cancelButton;

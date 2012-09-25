@@ -19,7 +19,7 @@ namespace NFCTalk
 {
     public partial class MainPage : PhoneApplicationPage
     {
-        NFCTalk.DataContext _dataContext = NFCTalk.DataContext.Singleton();
+        NFCTalk.DataContext _dataContext = NFCTalk.DataContext.Singleton;
         ApplicationBarIconButton _settingsButton;
         ProgressIndicator _progressIndicator = new ProgressIndicator();
 

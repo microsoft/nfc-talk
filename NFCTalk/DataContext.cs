@@ -13,19 +13,21 @@ namespace NFCTalk
     {
         static DataContext _singleton;
 
-        public static NFCTalk.DataContext Singleton()
+        public static NFCTalk.DataContext Singleton
         {
-            if (_singleton == null)
-                _singleton = new NFCTalk.DataContext();
+            get
+            {
+                if (_singleton == null)
+                    _singleton = new NFCTalk.DataContext();
 
-            return _singleton;
+                return _singleton;
+            }
         }
 
         public void Save()
         {
             try
             {
-                //Settings.Save();
                 IsolatedStorageSettings.ApplicationSettings["Settings"] = _settings;
                 IsolatedStorageSettings.ApplicationSettings["Messages"] = _messages;
             }

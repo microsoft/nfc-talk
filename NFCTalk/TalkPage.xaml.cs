@@ -16,7 +16,7 @@ namespace NFCTalk
 {
     public partial class TalkPage : PhoneApplicationPage
     {
-        NFCTalk.DataContext _dataContext = NFCTalk.DataContext.Singleton();
+        NFCTalk.DataContext _dataContext = NFCTalk.DataContext.Singleton;
 
         void scrollToLast()
         {
@@ -89,7 +89,7 @@ namespace NFCTalk
             });
         }
 
-        private void sendButton_Click(object sender, RoutedEventArgs e)
+        private async void sendButton_Click(object sender, RoutedEventArgs e)
         {
             Message m = new Message()
             {
@@ -101,7 +101,8 @@ namespace NFCTalk
             messageInput.Text = "";
 
             _dataContext.Messages.Add(m);
-            _dataContext.Communication.SendMessage(m);
+
+            await _dataContext.Communication.SendMessageAsync(m);
 
             scrollToLast();
         }

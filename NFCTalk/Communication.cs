@@ -64,7 +64,7 @@ namespace NFCTalk
             {
                 PeerName = "";
 
-                PeerFinder.DisplayName = NFCTalk.DataContext.Singleton().Settings.Name;
+                PeerFinder.DisplayName = NFCTalk.DataContext.Singleton.Settings.Name;
                 PeerFinder.TriggeredConnectionStateChanged += TriggeredConnectionStateChanged;
                 //PeerFinder.ConnectionRequested += ConnectionRequested;
 
@@ -130,7 +130,7 @@ namespace NFCTalk
 
                     ListenAsync();
 
-                    SendName(NFCTalk.DataContext.Singleton().Settings.Name);
+                    SendNameAsync(NFCTalk.DataContext.Singleton.Settings.Name);
 
                     if (Connected != null)
                     {
@@ -153,8 +153,8 @@ namespace NFCTalk
                     break;
             }
         }
-
-        public async void SendName(string name)
+        
+        async Task SendNameAsync(string name)
         {
             _writer.WriteUInt32(0);
 
@@ -165,7 +165,7 @@ namespace NFCTalk
             await _writer.StoreAsync();
         }
 
-        public async void SendMessage(Message m)
+        public async Task SendMessageAsync(Message m)
         {
             if (m.Text.Length > 0)
             {
@@ -196,7 +196,7 @@ namespace NFCTalk
             }
         }
 
-        private async void ListenAsync()
+        private async Task ListenAsync()
         {
             try
             {

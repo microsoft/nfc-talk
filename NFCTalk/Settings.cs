@@ -10,16 +10,6 @@ namespace NFCTalk
 {
     public class Settings : INotifyPropertyChanged
     {
-        public void Save()
-        {
-            IsolatedStorageSettings.ApplicationSettings["Settings.Name"] = _name;
-        }
-
-        public void Load()
-        {
-            _name = IsolatedStorageSettings.ApplicationSettings["Settings.Name"] as string;
-        }
-
         string _name = "";
         public string Name
         {

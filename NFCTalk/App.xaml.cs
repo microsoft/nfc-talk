@@ -63,7 +63,7 @@ namespace NFCTalk
         // This code will not execute when the application is reactivated
         private void Application_Launching(object sender, LaunchingEventArgs e)
         {
-            NFCTalk.DataContext.Singleton().Load();
+            NFCTalk.DataContext.Singleton.Load();
         }
 
         // Code to execute when the application is activated (brought to foreground)
@@ -76,14 +76,14 @@ namespace NFCTalk
         // This code will not execute when the application is closing
         private void Application_Deactivated(object sender, DeactivatedEventArgs e)
         {
-            NFCTalk.DataContext.Singleton().Save();
+            NFCTalk.DataContext.Singleton.Save();
         }
 
         // Code to execute when the application is closing (eg, user hit Back)
         // This code will not execute when the application is deactivated
         private void Application_Closing(object sender, ClosingEventArgs e)
         {
-            NFCTalk.DataContext.Singleton().Save();
+            NFCTalk.DataContext.Singleton.Save();
         }
 
         // Code to execute if a navigation fails
