@@ -50,10 +50,13 @@ namespace NFCTalk
                 {
                     _name = value;
 
-                    if (PropertyChanged != null)
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
                     {
-                        PropertyChanged(this, new PropertyChangedEventArgs("PeerName"));
-                    }
+                        if (PropertyChanged != null)
+                        {
+                            PropertyChanged(this, new PropertyChangedEventArgs("PeerName"));
+                        }
+                    });
                 }
             }
         }
@@ -251,10 +254,7 @@ namespace NFCTalk
                                 await GuaranteedLoadAsync(length);
                                 string name = _reader.ReadString(length);
 
-                                Deployment.Current.Dispatcher.BeginInvoke(() =>
-                                {
-                                    PeerName = name;
-                                });
+                                PeerName = name;
                             }
                             break;
 
@@ -268,7 +268,7 @@ namespace NFCTalk
 
                                 Message m = new Message()
                                 {
-                                    Name = _name,
+                                    Name = PeerName,
                                     Text = text,
                                     Direction = Message.DirectionValue.In
                                 };
