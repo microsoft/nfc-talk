@@ -25,10 +25,10 @@
         </StackPanel>
 
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,64">
                 <Image Source="Assets/ConnectGuide.png" Height="300" Width="300"/>
                 <TextBlock Text="{Binding Path=Settings.Name, StringFormat='Your name is set to \{0\}.'}" HorizontalAlignment="Center"/>
-                <TextBlock Text="Tap other device to connect." HorizontalAlignment="Center"/>
+                <TextBlock Text="Tap other device to connect." HorizontalAlignment="Center" Margin="0,24,0,0"/>
             </StackPanel>
         </Grid>
     </Grid>

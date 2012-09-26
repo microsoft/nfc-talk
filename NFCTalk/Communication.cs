@@ -22,20 +22,20 @@ namespace NFCTalk
         public Action ConnectionInterrupted;
         public Action<Message> MessageReceived;
 
-        enum ConnectionStatusValue
+        private enum ConnectionStatusValue
         {
             NotConnected = 0,
             Searching,
             Connecting,
             Listening,
             Connected
-        }
+        };
 
-        ConnectionStatusValue _status;
-        StreamSocket _socket;
-        DataWriter _writer;
-        DataReader _reader;
-        string _name;
+        private ConnectionStatusValue _status;
+        private StreamSocket _socket;
+        private DataWriter _writer;
+        private DataReader _reader;
+        private string _name;
 
         public string PeerName
         {
@@ -62,13 +62,12 @@ namespace NFCTalk
         {
             if (_status == ConnectionStatusValue.NotConnected)
             {
+                _status = ConnectionStatusValue.Searching;
+
                 PeerName = "";
 
                 PeerFinder.DisplayName = NFCTalk.DataContext.Singleton.Settings.Name;
                 PeerFinder.TriggeredConnectionStateChanged += TriggeredConnectionStateChanged;
-                //PeerFinder.ConnectionRequested += ConnectionRequested;
-
-                _status = ConnectionStatusValue.Searching;
 
                 PeerFinder.Start();
             }
@@ -85,76 +84,96 @@ namespace NFCTalk
                 case ConnectionStatusValue.Searching:
                 case ConnectionStatusValue.Connecting:
                 case ConnectionStatusValue.Listening:
-                    PeerFinder.Stop();
-                    PeerFinder.TriggeredConnectionStateChanged -= TriggeredConnectionStateChanged;
-                    _status = ConnectionStatusValue.NotConnected;
+                    {
+                        PeerFinder.Stop();
+                        PeerFinder.TriggeredConnectionStateChanged -= TriggeredConnectionStateChanged;
+                        _status = ConnectionStatusValue.NotConnected;
+                    }
                     break;
 
                 case ConnectionStatusValue.Connected:
-                    if (_socket != null)
                     {
-                        _socket.Dispose();
-                    }
+                        if (_socket != null)
+                        {
+                            _socket.Dispose();
+                        }
 
-                    _status = ConnectionStatusValue.NotConnected;
+                        _status = ConnectionStatusValue.NotConnected;
+                    }
                     break;
             }
         }
 
-        void TriggeredConnectionStateChanged(object sender, TriggeredConnectionStateChangedEventArgs e)
+        private void TriggeredConnectionStateChanged(object sender, TriggeredConnectionStateChangedEventArgs e)
         {
             switch (e.State)
             {
                 case TriggeredConnectState.PeerFound: System.Diagnostics.Debug.WriteLine("PeerFound");
-                    if (Connecting != null)
                     {
-                        Connecting();
+                        if (Connecting != null)
+                        {
+                            Connecting();
+                        }
                     }
                     break;
 
                 case TriggeredConnectState.Connecting: System.Diagnostics.Debug.WriteLine("Connecting");
-                    _status = ConnectionStatusValue.Connecting;
+                    {
+                        _status = ConnectionStatusValue.Connecting;
+                    }
                     break;
 
                 case TriggeredConnectState.Listening: System.Diagnostics.Debug.WriteLine("Listening");
-                    _status = ConnectionStatusValue.Listening;
+                    {
+                        _status = ConnectionStatusValue.Listening;
+                    }
                     break;
 
                 case TriggeredConnectState.Completed: System.Diagnostics.Debug.WriteLine("Completed");
-                    PeerFinder.Stop();
-                    PeerFinder.TriggeredConnectionStateChanged -= TriggeredConnectionStateChanged;
-                    _socket = e.Socket;
-                    _writer = new DataWriter(e.Socket.OutputStream);
-                    _reader = new DataReader(e.Socket.InputStream);
-                    _status = ConnectionStatusValue.Connected;
-
-                    ListenAsync();
-
-                    SendNameAsync(NFCTalk.DataContext.Singleton.Settings.Name);
-
-                    if (Connected != null)
                     {
-                        Connected();
+                        PeerFinder.Stop();
+                        PeerFinder.TriggeredConnectionStateChanged -= TriggeredConnectionStateChanged;
+                        _socket = e.Socket;
+                        _writer = new DataWriter(e.Socket.OutputStream);
+                        _writer.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8;
+                        _writer.ByteOrder = Windows.Storage.Streams.ByteOrder.LittleEndian;
+                        _reader = new DataReader(e.Socket.InputStream);
+                        _reader.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8;
+                        _reader.ByteOrder = Windows.Storage.Streams.ByteOrder.LittleEndian;
+                        _status = ConnectionStatusValue.Connected;
+
+                        ListenAsync();
+
+                        SendNameAsync(NFCTalk.DataContext.Singleton.Settings.Name);
+
+                        if (Connected != null)
+                        {
+                            Connected();
+                        }
                     }
                     break;
 
                 case TriggeredConnectState.Canceled: System.Diagnostics.Debug.WriteLine("Canceled");
-                    if (UnableToConnect != null)
                     {
-                        UnableToConnect();
+                        if (UnableToConnect != null)
+                        {
+                            UnableToConnect();
+                        }
                     }
                     break;
 
                 case TriggeredConnectState.Failed: System.Diagnostics.Debug.WriteLine("Failed");
-                    if (UnableToConnect != null)
                     {
-                        UnableToConnect();
+                        if (UnableToConnect != null)
+                        {
+                            UnableToConnect();
+                        }
                     }
                     break;
             }
         }
-        
-        async Task SendNameAsync(string name)
+
+        private async Task SendNameAsync(string name)
         {
             try
             {
@@ -181,11 +200,9 @@ namespace NFCTalk
             {
                 if (m.Text.Length > 0)
                 {
-                    uint length;
-
                     _writer.WriteUInt32(1);
 
-                    length = _writer.MeasureString(m.Text);
+                    uint length = _writer.MeasureString(m.Text);
                     _writer.WriteUInt32(length);
                     _writer.WriteString(m.Text);
 
@@ -243,10 +260,8 @@ namespace NFCTalk
 
                         case 1: // message
                             {
-                                uint length;
-
                                 await GuaranteedLoadAsync(sizeof(UInt32));
-                                length = _reader.ReadUInt32();
+                                uint length = _reader.ReadUInt32();
 
                                 await GuaranteedLoadAsync(length);
                                 string text = _reader.ReadString(length);
@@ -275,16 +290,5 @@ namespace NFCTalk
                 }
             }
         }
-
-        //private async void ConnectionRequested(object sender, ConnectionRequestedEventArgs e)
-        //{
-        //    switch (_status)
-        //    {
-        //        case ConnectionStatusValue.Connecting:
-        //            _socket = await PeerFinder.ConnectAsync(e.PeerInformation);
-        //            _status = ConnectionStatusValue.Connected;
-        //            break;
-        //    }
-        //}
     }
 }
