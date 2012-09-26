@@ -180,7 +180,8 @@ namespace NFCTalk
         {
             try
             {
-                _writer.WriteUInt32(0);
+                _writer.WriteUInt32(0); // protocol version
+                _writer.WriteUInt32(0); // operation identifier
 
                 uint length = _writer.MeasureString(name);
                 _writer.WriteUInt32(length);
@@ -203,7 +204,8 @@ namespace NFCTalk
             {
                 if (m.Text.Length > 0)
                 {
-                    _writer.WriteUInt32(1);
+                    _writer.WriteUInt32(0); // protocol version
+                    _writer.WriteUInt32(1); // operation identifier
 
                     uint length = _writer.MeasureString(m.Text);
                     _writer.WriteUInt32(length);
@@ -243,42 +245,52 @@ namespace NFCTalk
                 while (true)
                 {
                     await GuaranteedLoadAsync(sizeof(UInt32));
-                    uint code = _reader.ReadUInt32();
+                    uint version = _reader.ReadUInt32();
 
-                    switch (code)
+                    if (version == 0)
                     {
-                        case 0: // name
-                            {
-                                await GuaranteedLoadAsync(sizeof(UInt32));
-                                uint length = _reader.ReadUInt32();
-                                await GuaranteedLoadAsync(length);
-                                string name = _reader.ReadString(length);
+                        await GuaranteedLoadAsync(sizeof(UInt32));
+                        uint operation = _reader.ReadUInt32();
 
-                                PeerName = name;
-                            }
-                            break;
-
-                        case 1: // message
-                            {
-                                await GuaranteedLoadAsync(sizeof(UInt32));
-                                uint length = _reader.ReadUInt32();
-
-                                await GuaranteedLoadAsync(length);
-                                string text = _reader.ReadString(length);
-
-                                Message m = new Message()
+                        switch (operation)
+                        {
+                            case 0: // name
                                 {
-                                    Name = PeerName,
-                                    Text = text,
-                                    Direction = Message.DirectionValue.In
-                                };
+                                    await GuaranteedLoadAsync(sizeof(UInt32));
+                                    uint length = _reader.ReadUInt32();
+                                    await GuaranteedLoadAsync(length);
+                                    string name = _reader.ReadString(length);
 
-                                if (MessageReceived != null)
-                                {
-                                    MessageReceived(m);
+                                    PeerName = name;
                                 }
-                            }
-                            break;
+                                break;
+
+                            case 1: // message
+                                {
+                                    await GuaranteedLoadAsync(sizeof(UInt32));
+                                    uint length = _reader.ReadUInt32();
+
+                                    await GuaranteedLoadAsync(length);
+                                    string text = _reader.ReadString(length);
+
+                                    Message m = new Message()
+                                    {
+                                        Name = PeerName,
+                                        Text = text,
+                                        Direction = Message.DirectionValue.In
+                                    };
+
+                                    if (MessageReceived != null)
+                                    {
+                                        MessageReceived(m);
+                                    }
+                                }
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception("Protocol version mismatch");
                     }
                 }
             }
