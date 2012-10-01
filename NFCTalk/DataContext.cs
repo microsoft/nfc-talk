@@ -40,7 +40,6 @@ namespace NFCTalk
         {
             try
             {
-                //Settings.Load();
                 _settings = IsolatedStorageSettings.ApplicationSettings["Settings"] as Settings;
                 _messages = IsolatedStorageSettings.ApplicationSettings["Messages"] as ObservableCollection<Message>;
             }
