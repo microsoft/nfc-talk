@@ -16,6 +16,10 @@ using Windows.Storage.Streams;
 
 namespace NFCTalk
 {
+    /// <summary>
+    /// Peer to peer communication abstraction. Handles creating socket connections
+    /// from tap events and also further handles sending and receiving chat messages.
+    /// </summary>
     class Communication : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -41,6 +45,9 @@ namespace NFCTalk
         private DataReader _reader;
         private string _name;
 
+        /// <summary>
+        /// Chat name of the other device.
+        /// </summary>
         public string PeerName
         {
             get
@@ -65,6 +72,15 @@ namespace NFCTalk
             }
         }
 
+        /// <summary>
+        /// Start listening to tap events and attempt to connect if such occurs.
+        /// 
+        /// Connecting action will be invoked when a tap event happens.
+        /// Connected action will be invoked when a connection with another device has been established.
+        /// UnableToConnect action will be invoked if connection to another device cannot be made.
+        /// ConnectionInterrupted action will be invoked if connection to another device breaks.
+        /// MessageReceived action will be invoked when a message from another device has been received.
+        /// </summary>
         public void Connect()
         {
             if (_status == ConnectionStatusValue.NotConnected)
@@ -84,6 +100,9 @@ namespace NFCTalk
             }
         }
 
+        /// <summary>
+        /// Disconnect currently active session and/or stop listening to tap events.
+        /// </summary>
         public void Disconnect()
         {
             switch (_status)
@@ -140,13 +159,17 @@ namespace NFCTalk
                     {
                         PeerFinder.Stop();
                         PeerFinder.TriggeredConnectionStateChanged -= TriggeredConnectionStateChanged;
+
                         _socket = e.Socket;
+
                         _writer = new DataWriter(e.Socket.OutputStream);
                         _writer.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8;
                         _writer.ByteOrder = Windows.Storage.Streams.ByteOrder.LittleEndian;
+
                         _reader = new DataReader(e.Socket.InputStream);
                         _reader.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8;
                         _reader.ByteOrder = Windows.Storage.Streams.ByteOrder.LittleEndian;
+
                         _status = ConnectionStatusValue.Connected;
 
                         ListenAsync();
@@ -180,6 +203,10 @@ namespace NFCTalk
             }
         }
 
+        /// <summary>
+        /// Sends chat name to the other device.
+        /// </summary>
+        /// <param name="name">Chat name to send</param>
         private async Task SendNameAsync(string name)
         {
             try
@@ -202,6 +229,10 @@ namespace NFCTalk
             }
         }
 
+        /// <summary>
+        /// Sends a chat message to the other device.
+        /// </summary>
+        /// <param name="m">Message to send</param>
         public async Task SendMessageAsync(Message m)
         {
             try
@@ -227,6 +258,11 @@ namespace NFCTalk
             }
         }
 
+        /// <summary>
+        /// Attempts to load the requested amount of bytes. Throws an Exception if the connection
+        /// is no longer up.
+        /// </summary>
+        /// <param name="length">Amount of incoming bytes to load</param>
         private async Task GuaranteedLoadAsync(uint length)
         {
             DataReaderLoadOperation op;
@@ -242,6 +278,13 @@ namespace NFCTalk
             }
         }
 
+        /// <summary>
+        /// Listens to incoming transmissions.
+        /// 
+        /// PeerName property is updates if a chat name is received from the other device.
+        /// MessageReceived action will be invoked when a message from another device has been received.
+        /// ConnectionInterrupted action will be invoked if connection to another device breaks.
+        /// </summary>
         private async Task ListenAsync()
         {
             try

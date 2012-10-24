@@ -17,11 +17,17 @@ using Microsoft.Phone.Tasks;
 
 namespace NFCTalk
 {
+    /// <summary>
+    /// MainPage instructs user to tap other device to connect. If chat name has not been
+    /// set yet application is automatically navigated to the SettingsPage to fill in the name.
+    /// 
+    /// Tapping other device navigates application to the TalkPage.
+    /// </summary>
     public partial class MainPage : PhoneApplicationPage
     {
-        NFCTalk.DataContext _dataContext = NFCTalk.DataContext.Singleton;
-        ApplicationBarIconButton _settingsButton;
-        ProgressIndicator _progressIndicator = new ProgressIndicator();
+        private NFCTalk.DataContext _dataContext = NFCTalk.DataContext.Singleton;
+        private ApplicationBarIconButton _settingsButton;
+        private ProgressIndicator _progressIndicator = new ProgressIndicator();
 
         public MainPage()
         {
@@ -39,6 +45,10 @@ namespace NFCTalk
             _progressIndicator.IsIndeterminate = true;
         }
 
+        /// <summary>
+        /// If chat name has not been set yet (application has never been run) application
+        /// automatically navigates to SettingsPage, otherwise listening to tap events is started.
+        /// </summary>
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
             if (_dataContext.Settings.Name.Length == 0)
@@ -59,6 +69,12 @@ namespace NFCTalk
             base.OnNavigatedTo(e);
         }
 
+        /// <summary>
+        /// Listening to tap events is stopped when navigating away from MainPage as
+        /// we don't want to allow connecting while in SettingsPage or AboutPage, or while
+        /// a connection is already established.
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
         {
             _dataContext.Communication.Connected -= Connected;
@@ -69,6 +85,11 @@ namespace NFCTalk
             base.OnNavigatingFrom(e);
         }
 
+        /// <summary>
+        /// Event handler to execute when connection has been established.
+        /// 
+        /// Application is navigated to TalkPage.
+        /// </summary>
         private void Connected()
         {
             Deployment.Current.Dispatcher.BeginInvoke(() =>
@@ -79,6 +100,9 @@ namespace NFCTalk
             });
         }
 
+        /// <summary>
+        /// Event handler to execute when connection is being made.
+        /// </summary>
         private void Connecting()
         {
             Deployment.Current.Dispatcher.BeginInvoke(() =>
@@ -89,6 +113,11 @@ namespace NFCTalk
             });
         }
 
+        /// <summary>
+        /// Event handler to execute when connection is interrupted.
+        /// 
+        /// Attempting to connect is restarted.
+        /// </summary>
         private void ConnectionInterrupted()
         {
             _dataContext.Communication.Disconnect();
@@ -102,6 +131,11 @@ namespace NFCTalk
             });
         }
 
+        /// <summary>
+        /// Event handler to execute when attempting to connect fails.
+        /// 
+        /// Dialog asking to verify that a secondary bearer is available is displayed.
+        /// </summary>
         private void UnableToConnect()
         {
             _dataContext.Communication.Disconnect();
@@ -125,6 +159,10 @@ namespace NFCTalk
             });
         }
 
+        /// <summary>
+        /// Show system tray progress indicator.
+        /// </summary>
+        /// <param name="msg">Text to show</param>
         private void ShowProgress(String msg)
         {
             _progressIndicator.Text = msg;
@@ -133,6 +171,9 @@ namespace NFCTalk
             SystemTray.SetProgressIndicator(this, _progressIndicator);
         }
 
+        /// <summary>
+        /// Hide system tray progress indicator.
+        /// </summary>
         private void HideProgress()
         {
             _progressIndicator.IsVisible = false;
@@ -140,6 +181,11 @@ namespace NFCTalk
             SystemTray.SetProgressIndicator(this, _progressIndicator);
         }
 
+        /// <summary>
+        /// Event handler to execute when settings button has been clicked.
+        /// 
+        /// Attempting to connect is stopped and application navigates to SettingsPage.
+        /// </summary>
         private void settingsButton_Click(object sender, EventArgs e)
         {
             _dataContext.Communication.Disconnect();
@@ -147,6 +193,11 @@ namespace NFCTalk
             NavigationService.Navigate(new Uri("/SettingsPage.xaml", UriKind.Relative));
         }
 
+        /// <summary>
+        /// Event handler to execute when about button has been clicked.
+        /// 
+        /// Attempting to connect is stopped and application navigates to AboutPage.
+        /// </summary>
         private void aboutMenuItem_Click(object sender, EventArgs e)
         {
             _dataContext.Communication.Disconnect();

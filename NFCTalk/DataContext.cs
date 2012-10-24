@@ -12,10 +12,20 @@ using System.IO.IsolatedStorage;
 
 namespace NFCTalk
 {
+    /// <summary>
+    /// DataContext holds application settings, messages and objects that
+    /// are used from multiple pages.
+    /// </summary>
     class DataContext
     {
-        static DataContext _singleton;
+        private static DataContext _singleton;
+        private Settings _settings = null;
+        private ObservableCollection<Message> _messages = null;
+        private Communication _communication = null;
 
+        /// <summary>
+        /// DataContext singleton instance.
+        /// </summary>
         public static NFCTalk.DataContext Singleton
         {
             get
@@ -27,6 +37,9 @@ namespace NFCTalk
             }
         }
 
+        /// <summary>
+        /// Save settings and messages to persistent storage.
+        /// </summary>
         public void Save()
         {
             try
@@ -39,6 +52,9 @@ namespace NFCTalk
             }
         }
 
+        /// <summary>
+        /// Load settings and messages from persistent storage.
+        /// </summary>
         public void Load()
         {
             try
@@ -51,7 +67,9 @@ namespace NFCTalk
             }
         }
 
-        Settings _settings = null;
+        /// <summary>
+        /// Application settings.
+        /// </summary>
         public Settings Settings
         {
             get
@@ -63,7 +81,9 @@ namespace NFCTalk
             }
         }
 
-        ObservableCollection<Message> _messages = null;
+        /// <summary>
+        /// Chat messages.
+        /// </summary>
         public ObservableCollection<Message> Messages
         {
             get
@@ -75,7 +95,9 @@ namespace NFCTalk
             }
         }
 
-        Communication _communication = null;
+        /// <summary>
+        /// Communication object.
+        /// </summary>
         public Communication Communication
         {
             get

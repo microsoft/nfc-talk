@@ -8,6 +8,9 @@
 
 namespace NFCTalk
 {
+    /// <summary>
+    /// Representation for a single chat message.
+    /// </summary>
     public class Message
     {
         public enum DirectionValue
@@ -16,9 +19,24 @@ namespace NFCTalk
             Out = 1
         }
 
+        /// <summary>
+        /// Direction of message, in to this device, or out to the other device.
+        /// </summary>
         public DirectionValue Direction { get; set; }
+
+        /// <summary>
+        /// Sender's name.
+        /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// Message.
+        /// </summary>
         public string Text { get; set; }
+
+        /// <summary>
+        /// Is this message archived.
+        /// </summary>
         public bool Archived { get; set; }
     }
 }

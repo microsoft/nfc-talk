@@ -13,7 +13,6 @@ namespace NFCTalk
 {
     public partial class AboutPage : PhoneApplicationPage
     {
-
         public AboutPage()
         {
             InitializeComponent();

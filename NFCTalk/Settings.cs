@@ -12,7 +12,13 @@ namespace NFCTalk
 {
     public class Settings : INotifyPropertyChanged
     {
-        string _name = "";
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private string _name = "";
+
+        /// <summary>
+        /// Chat name of this device.
+        /// </summary>
         public string Name
         {
             get
@@ -33,7 +39,5 @@ namespace NFCTalk
                 }
             }
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

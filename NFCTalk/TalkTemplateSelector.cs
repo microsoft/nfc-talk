@@ -13,6 +13,10 @@ using System.Windows.Controls;
 
 namespace NFCTalk
 {
+    /// <summary>
+    /// XAML template selector to select between current and archived messages as well as
+    /// between inbound and outbound messages. See TalkPage.xaml for details on the templates.
+    /// </summary>
     public class TalkTemplateSelector : ContentControl
     {
         public DataTemplate InBoundTemplate { get; set; }
@@ -25,10 +29,21 @@ namespace NFCTalk
         {
             base.OnContentChanged(oldContent, newContent);
 
-            ContentTemplate = SelectTemplate(newContent, this);
+            ContentTemplate = SelectTemplate(newContent);
         }
 
-        public DataTemplate SelectTemplate(object item, DependencyObject container)
+        /// <summary>
+        /// If item is an inbound Message to a currently active session InBoundTemplate
+        /// is selected. If item is an inbound Message to an already closed session
+        /// InBoundArchivedTemplate is selected.
+        /// 
+        /// If item is an outbound Message to a currently active session OutBoundTemplate
+        /// is selected. If item is an outbound Message to an already closed session
+        /// OutBoundArchivedTemplate is selected.
+        /// </summary>
+        /// <param name="item">Message object</param>
+        /// <returns></returns>
+        public DataTemplate SelectTemplate(object item)
         {
             Message message = item as Message;
             Message.DirectionValue direction;
