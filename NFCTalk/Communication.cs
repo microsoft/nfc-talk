@@ -130,6 +130,9 @@ namespace NFCTalk
             }
         }
 
+        /// <summary>
+        /// Event handler to be executed when PeerFinder's TriggeredConnectionStateChanged changes.
+        /// </summary>
         private void TriggeredConnectionStateChanged(object sender, TriggeredConnectionStateChangedEventArgs e)
         {
             switch (e.State)
