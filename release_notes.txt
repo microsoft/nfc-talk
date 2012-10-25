@@ -1,0 +1,149 @@
+NFC Talk
+========
+
+NFC Talk application demonstrates connection initiation by tapping devices
+together, using the Windows Phone 8 Proximity API, the
+Windows.Networking.Proximity.PeerFinder and the related classes.
+
+The example has been developed with Silverlight for Windows Phone devices
+and tested to work on Windows Phone 8.
+
+This example application is hosted in Nokia Developer Projects:
+- http://projects.developer.nokia.com/nfctalk
+
+For more information on implementation and porting, visit the wiki pages:
+- http://projects.developer.nokia.com/nfctalk/wiki
+
+
+What's new
+----------
+
+Version 1.0.0.0: First release of the NFC Talk
+
+
+1. Usage
+-------------------------------------------------------------------------------
+
+This is a simple build-and-run solution. Learn about Proximity API usage for
+opening communication channels to application instances on other devices by
+trying out the application. 
+
+
+2. Prerequisites
+-------------------------------------------------------------------------------
+
+- C# basics
+- Windows 8
+- Development environment Microsoft Visual Studio Express for Windows Phone 2012
+
+
+3. Project structure and implementation
+-------------------------------------------------------------------------------
+
+3.1 Folders
+-----------
+
+ |                  The root folder contains the project file, the license 
+ |                  information and this file (release_notes.txt).
+ |
+ |- NFCTalk         Root folder for the implementation files.  
+ |  |
+ |  |- Assets       Graphic assets like icons and tiles.
+ |  |
+ |  |- Properties   Application property files.
+ |  |
+ |  |- Resources    Application resources.
+
+
+3.2 Important files and classes
+-------------------------------
+
+| File                           | Description                                |
+|--------------------------------|--------------------------------------------|
+| MainPage.xaml(.cs)             | The main page of the application.          |
+|                                |                                            |
+|--------------------------------|--------------------------------------------|
+| TalkPage.xaml(.cs)             | The page that is used to chat with peer.   |
+|                                |                                            |
+|--------------------------------|--------------------------------------------|
+| Communication.cs               | Class that encapsulates the usage of the   |
+|                                | Proximity API.                             |
+|--------------------------------|--------------------------------------------|
+
+
+3.3 Used APIs/Windows Phone Components
+--------------------------------------
+
+using Windows.Networking.Proximity;
+using Windows.Networking.Sockets;
+using Windows.Storage.Streams;
+
+
+4. Compatibility
+-------------------------------------------------------------------------------
+
+- Windows Phone 8
+
+Tested to work on Lumia 820 and Lumia 920. 
+Developed with Microsoft Visual Studio Express for Windows Phone 2012.
+
+
+4.1 Required Capabilities
+-------------------------
+
+ID_CAP_NETWORKING
+ID_CAP_PROXIMITY
+
+
+4.2 Known Issues
+----------------
+
+None.
+
+
+5. Building, installing, and running the application
+-------------------------------------------------------------------------------
+
+5.1 Preparations
+----------------
+
+Make sure you have the following installed:
+ * Windows 8
+ * Windows Phone SDK 8.0
+
+5.2 Using the WINDOWS PHONE 8 SDK
+---------------------------------
+
+1. Open the SLN file:
+   File > Open Project, select the file NFCTalk.sln
+2. Select the target 'Device'.
+3. Press F5 to build the project and run it on the device.
+
+5.3 Deploying to Windows Phone 8
+--------------------------------
+
+Please see official documentation for deploying and testing applications on
+Windows Phone devices:
+http://msdn.microsoft.com/en-us/library/gg588378%28v=vs.92%29.aspx
+
+
+6. License
+-------------------------------------------------------------------------------
+
+See the license text file delivered with this project. The license file is also
+available online at http://projects.developer.nokia.com/nfctalk/browser/Licence.txt
+
+
+7. Related documentation
+-------------------------------------------------------------------------------
+
+An article "Opening sockets with NFC" published on Nokia Lumia Developer's Library
+(http://www.developer.nokia.com/Resources/Library/Lumia/#!opening-sockets-with-nfc.html) 
+describes the usage of Proximity API to open sockets to peer devices in more detail.
+
+
+8. Version history
+-------------------------------------------------------------------------------
+
+1.0.0.0 First release of the NFC Talk
+
