@@ -6,7 +6,7 @@ together, using the Windows Phone 8 Proximity API, the
 Windows.Networking.Proximity.PeerFinder and the related classes.
 
 The example has been developed with Silverlight for Windows Phone devices
-and tested to work on Windows Phone 8.
+and tested to work on Nokia Lumia devices with Windows Phone 8.
 
 This example application is hosted in Nokia Developer Projects:
 - http://projects.developer.nokia.com/nfctalk
@@ -84,7 +84,7 @@ using Windows.Storage.Streams;
 
 - Windows Phone 8
 
-Tested to work on Lumia 820 and Lumia 920. 
+Tested to work on Nokia Lumia 820 and Nokia Lumia 920. 
 Developed with Microsoft Visual Studio Express for Windows Phone 2012.
 
 
@@ -145,5 +145,4 @@ describes the usage of Proximity API to open sockets to peer devices in more det
 8. Version history
 -------------------------------------------------------------------------------
 
-1.0.0.0 First release of the NFC Talk
-
+1.0.0.0 First release.
