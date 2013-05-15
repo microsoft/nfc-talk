@@ -51,7 +51,7 @@ namespace NFCTalk
 
             _dataContext.Communication.Connected += Connected;
             _dataContext.Communication.Connecting += Connecting;
-            _dataContext.Communication.UnableToConnect += UnableToConnect;
+            _dataContext.Communication.ConnectivityProblem += ConnectivityProblem;
             _dataContext.Communication.Searching += Searching;
             _dataContext.Communication.SearchFinished += SearchFinished;
 
@@ -75,7 +75,7 @@ namespace NFCTalk
 
             _dataContext.Communication.Connected -= Connected;
             _dataContext.Communication.Connecting -= Connecting;
-            _dataContext.Communication.UnableToConnect -= UnableToConnect;
+            _dataContext.Communication.ConnectivityProblem -= ConnectivityProblem;
             _dataContext.Communication.Searching -= Searching;
             _dataContext.Communication.SearchFinished -= SearchFinished;
         }
@@ -138,7 +138,7 @@ namespace NFCTalk
         /// 
         /// Dialog asking to verify that a secondary bearer is available is displayed.
         /// </summary>
-        private void UnableToConnect()
+        private void ConnectivityProblem()
         {
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {

@@ -60,7 +60,7 @@ namespace NFCTalk
                 PhoneApplicationService.Current.UserIdleDetectionMode = IdleDetectionMode.Disabled;
             }
 
-            _dataContext.Communication.UnableToConnect += UnableToConnect;
+            _dataContext.Communication.ConnectivityProblem += ConnectivityProblem;
             _dataContext.Communication.ConnectionInterrupted += ConnectionInterrupted;
         }
 
@@ -72,7 +72,7 @@ namespace NFCTalk
             _dataContext.Communication.Start();
         }
 
-        private void UnableToConnect()
+        private void ConnectivityProblem()
         {
             _dataContext.Communication.Stop();
             _dataContext.Communication.Start();

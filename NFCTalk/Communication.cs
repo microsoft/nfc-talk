@@ -27,7 +27,7 @@ namespace NFCTalk
 
         public Action Connecting;
         public Action Connected;
-        public Action UnableToConnect;
+        public Action ConnectivityProblem;
         public Action ConnectionInterrupted;
         public Action<Message> MessageReceived;
         public Action Searching;
@@ -35,7 +35,7 @@ namespace NFCTalk
 
         private enum ConnectionStatusValue
         {
-            NotConnected = 0,
+            Idle = 0,
             Searching,
             Connecting,
             Listening,
@@ -48,6 +48,14 @@ namespace NFCTalk
         private DataReader _reader;
         private string _name;
         private IReadOnlyList<PeerInformation> _peers;
+
+        public bool IsConnected
+        {
+            get
+            {
+                return _status == ConnectionStatusValue.Connected;
+            }
+        }
 
         /// <summary>
         /// Chat name of the other device.
@@ -105,13 +113,13 @@ namespace NFCTalk
         /// 
         /// Connecting action will be invoked when a tap event happens.
         /// Connected action will be invoked when a connection with another device has been established.
-        /// UnableToConnect action will be invoked if connection to another device cannot be made.
+        /// ConnectivityProblem action will be invoked if connection to another device cannot be made.
         /// ConnectionInterrupted action will be invoked if connection to another device breaks.
         /// MessageReceived action will be invoked when a message from another device has been received.
         /// </summary>
         public void Start()
         {
-            if (_status == ConnectionStatusValue.NotConnected)
+            if (_status == ConnectionStatusValue.Idle)
             {
                 _status = ConnectionStatusValue.Searching;
 
@@ -134,17 +142,16 @@ namespace NFCTalk
         /// </summary>
         public void Stop()
         {
+            PeerFinder.Stop();
+
             switch (_status)
             {
                 case ConnectionStatusValue.Searching:
                 case ConnectionStatusValue.Connecting:
                 case ConnectionStatusValue.Listening:
                     {
-                        PeerFinder.Stop();
                         PeerFinder.TriggeredConnectionStateChanged -= TriggeredConnectionStateChanged;
                         PeerFinder.ConnectionRequested -= ConnectionRequested;
-
-                        _status = ConnectionStatusValue.NotConnected;
                     }
                     break;
 
@@ -155,11 +162,11 @@ namespace NFCTalk
                             _socket.Dispose();
                             _socket = null;
                         }
-
-                        _status = ConnectionStatusValue.NotConnected;
                     }
                     break;
             }
+
+            _status = ConnectionStatusValue.Idle;
         }
 
         public void Disconnect()
@@ -181,7 +188,7 @@ namespace NFCTalk
 
         public async void Search()
         {
-            if (_status == ConnectionStatusValue.Searching)
+            if (_status != ConnectionStatusValue.Idle)
             {
                 Peers = null;
 
@@ -201,9 +208,9 @@ namespace NFCTalk
                 }
                 catch (Exception ex)
                 {
-                    if (UnableToConnect != null)
+                    if (ConnectivityProblem != null)
                     {
-                        UnableToConnect();
+                        ConnectivityProblem();
                     }
                 }
             }
@@ -250,16 +257,16 @@ namespace NFCTalk
                         Connected();
                     }
                 }
-                else if (UnableToConnect != null)
+                else if (ConnectivityProblem != null)
                 {
-                    UnableToConnect();
+                    ConnectivityProblem();
                 }
             }
             catch (Exception ex)
             {
-                if (UnableToConnect != null)
+                if (ConnectivityProblem != null)
                 {
-                    UnableToConnect();
+                    ConnectivityProblem();
                 }
             }
         }
@@ -322,18 +329,18 @@ namespace NFCTalk
 
                 case TriggeredConnectState.Canceled: System.Diagnostics.Debug.WriteLine("Canceled");
                     {
-                        if (UnableToConnect != null)
+                        if (ConnectivityProblem != null)
                         {
-                            UnableToConnect();
+                            ConnectivityProblem();
                         }
                     }
                     break;
 
                 case TriggeredConnectState.Failed: System.Diagnostics.Debug.WriteLine("Failed");
                     {
-                        if (UnableToConnect != null)
+                        if (ConnectivityProblem != null)
                         {
-                            UnableToConnect();
+                            ConnectivityProblem();
                         }
                     }
                     break;
@@ -344,6 +351,11 @@ namespace NFCTalk
         {
             try
             {
+                if (Connecting != null)
+                {
+                    Connecting();
+                }
+
                 _socket = await PeerFinder.ConnectAsync(e.PeerInformation);
 
                 PeerFinder.TriggeredConnectionStateChanged -= TriggeredConnectionStateChanged;
@@ -370,9 +382,9 @@ namespace NFCTalk
             }
             catch (Exception ex)
             {
-                if (UnableToConnect != null)
+                if (ConnectivityProblem != null)
                 {
-                    UnableToConnect();
+                    ConnectivityProblem();
                 }
             }
         }

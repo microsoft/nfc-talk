@@ -46,17 +46,24 @@ namespace NFCTalk
         {
             base.OnNavigatedTo(e);
 
-            sendButton.IsEnabled = false;
-
-            _dataContext.Communication.ConnectionInterrupted += ConnectionInterrupted;
-            _dataContext.Communication.MessageReceived += MessageReceived;
-
-            _dataContext.Messages.CollectionChanged += MessagesChanged;
-
-            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            if (_dataContext.Communication.IsConnected)
             {
-                scrollToLast();
-            });
+                sendButton.IsEnabled = false;
+
+                _dataContext.Communication.ConnectionInterrupted += ConnectionInterrupted;
+                _dataContext.Communication.MessageReceived += MessageReceived;
+
+                _dataContext.Messages.CollectionChanged += MessagesChanged;
+
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    scrollToLast();
+                });
+            }
+            else
+            {
+                NavigationService.GoBack();
+            }
         }
 
         /// <summary>

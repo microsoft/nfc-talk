@@ -52,7 +52,7 @@ namespace NFCTalk
 
             _dataContext.Communication.Connected += Connected;
             _dataContext.Communication.Connecting += Connecting;
-            _dataContext.Communication.UnableToConnect += UnableToConnect;
+            _dataContext.Communication.ConnectivityProblem += ConnectivityProblem;
         }
 
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
@@ -61,7 +61,7 @@ namespace NFCTalk
 
             _dataContext.Communication.Connected -= Connected;
             _dataContext.Communication.Connecting -= Connecting;
-            _dataContext.Communication.UnableToConnect -= UnableToConnect;
+            _dataContext.Communication.ConnectivityProblem -= ConnectivityProblem;
         }
 
         /// <summary>
@@ -89,13 +89,11 @@ namespace NFCTalk
                 NavigationService.Navigate(new Uri("/TalkPage.xaml", UriKind.Relative));
             });
         }
-
+        
         /// <summary>
         /// Event handler to execute when attempting to connect fails.
-        /// 
-        /// Dialog asking to verify that a secondary bearer is available is displayed.
         /// </summary>
-        private void UnableToConnect()
+        private void ConnectivityProblem()
         {
             Dispatcher.BeginInvoke(() =>
             {
