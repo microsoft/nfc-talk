@@ -12,12 +12,13 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
+using Microsoft.Phone.Tasks;
 
 namespace NFCTalk
 {
     public partial class App : Application
     {
-        NFCTalk.DataContext _dataContext = NFCTalk.DataContext.Singleton;
+        private NFCTalk.DataContext _dataContext = NFCTalk.DataContext.Singleton;
 
         /// <summary>
         /// Provides easy access to the root frame of the Phone Application.
@@ -59,6 +60,8 @@ namespace NFCTalk
                 PhoneApplicationService.Current.UserIdleDetectionMode = IdleDetectionMode.Disabled;
             }
 
+            _dataContext.Communication.UnableToConnect += UnableToConnect;
+            _dataContext.Communication.ConnectionInterrupted += ConnectionInterrupted;
         }
 
         // Code to execute when the application is launching (eg, from Start)
@@ -66,19 +69,45 @@ namespace NFCTalk
         private void Application_Launching(object sender, LaunchingEventArgs e)
         {
             _dataContext.Load();
+            _dataContext.Communication.Start();
+        }
+
+        private void UnableToConnect()
+        {
+            _dataContext.Communication.Stop();
+            _dataContext.Communication.Start();
+
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    MessageBoxResult r = MessageBox.Show("Would you like to make sure that Bluetooth has been turned on?", "Unable to connect", MessageBoxButton.OKCancel);
+
+                    if (r.HasFlag(MessageBoxResult.OK))
+                    {
+                        ConnectionSettingsTask connectionSettingsTask = new ConnectionSettingsTask();
+                        connectionSettingsTask.ConnectionSettingsType = ConnectionSettingsType.Bluetooth;
+                        connectionSettingsTask.Show();
+                    }
+                });
+        }
+
+        private void ConnectionInterrupted()
+        {
+            _dataContext.Communication.Stop();
+            _dataContext.Communication.Start();
         }
 
         // Code to execute when the application is activated (brought to foreground)
         // This code will not execute when the application is first launched
         private void Application_Activated(object sender, ActivatedEventArgs e)
         {
+            _dataContext.Communication.Start();
         }
 
         // Code to execute when the application is deactivated (sent to background)
         // This code will not execute when the application is closing
         private void Application_Deactivated(object sender, DeactivatedEventArgs e)
         {
-            _dataContext.Communication.Disconnect();
+            _dataContext.Communication.Stop();
             _dataContext.Save();
         }
 
@@ -86,7 +115,7 @@ namespace NFCTalk
         // This code will not execute when the application is deactivated
         private void Application_Closing(object sender, ClosingEventArgs e)
         {
-            _dataContext.Communication.Disconnect();
+            _dataContext.Communication.Stop();
             _dataContext.Save();
         }
 

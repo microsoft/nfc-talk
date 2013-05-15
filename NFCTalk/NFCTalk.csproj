@@ -104,6 +104,9 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Message.cs" />
+    <Compile Include="PeersPage.xaml.cs">
+      <DependentUpon>PeersPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources\AppResources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -134,6 +137,10 @@
     <DesignData Include="SampleData\MessagesSampleData.xaml">
       <SubType>Designer</SubType>
     </DesignData>
+    <Page Include="PeersPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="SettingsPage.xaml">
       <SubType>Designer</SubType>
     </Page>
@@ -146,6 +153,7 @@
     <None Include="Properties\WMAppManifest.xml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\ConnectGuideBlack.png" />
     <Content Include="Assets\Icons\appbar.feature.settings.rest.png" />
     <Content Include="Assets\Icons\appbar.feature.search.rest.png" />
     <Content Include="Assets\Icons\appbar.close.rest.png" />
@@ -157,7 +165,7 @@
     <Content Include="Assets\ApplicationIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\ConnectGuide.png" />
+    <Content Include="Assets\ConnectGuideWhite.png" />
     <Content Include="Assets\Tiles\FlipCycleTileLarge.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

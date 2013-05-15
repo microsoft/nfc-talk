@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright © 2012-2013 Nokia Corporation. All rights reserved.
+ * Copyright © 2013 Nokia Corporation. All rights reserved.
  * Nokia and Nokia Connecting People are registered trademarks of Nokia Corporation. 
  * Other product and company names mentioned herein may be trademarks
  * or trade names of their respective owners. 
@@ -13,37 +13,22 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
+using Windows.Networking.Proximity;
 
 namespace NFCTalk
 {
-    /// <summary>
-    /// SettingsPage enables editing the chat name for this device.
-    /// </summary>
-    public partial class SettingsPage : PhoneApplicationPage
+    public partial class PeersPage : PhoneApplicationPage
     {
         private NFCTalk.DataContext _dataContext = NFCTalk.DataContext.Singleton;
         private ProgressIndicator _progressIndicator = new ProgressIndicator();
-        private ApplicationBarIconButton _saveButton;
 
-        public SettingsPage()
+        public PeersPage()
         {
-            DataContext = _dataContext;
-
             InitializeComponent();
 
-            _saveButton = ApplicationBar.Buttons[0] as ApplicationBarIconButton;
-        }
+            DataContext = _dataContext;
 
-        /// <summary>
-        /// Event handler to be executed when save button is clicked.
-        /// 
-        /// Saves the entered chat name to the application settings.
-        /// </summary>
-        private void saveButton_Click(object sender, EventArgs e)
-        {
-            _dataContext.Settings.Name = nameInput.Text;
-
-            NavigationService.GoBack();
+            _progressIndicator.IsIndeterminate = true;
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -71,6 +56,8 @@ namespace NFCTalk
         {
             Dispatcher.BeginInvoke(() =>
             {
+                PeersListBox.IsEnabled = false;
+
                 ShowProgress("Connecting...");
             });
         }
@@ -87,9 +74,9 @@ namespace NFCTalk
                 HideProgress();
 
                 NavigationService.Navigate(new Uri("/TalkPage.xaml", UriKind.Relative));
+                NavigationService.RemoveBackEntry();
             });
         }
-
         /// <summary>
         /// Event handler to execute when attempting to connect fails.
         /// 
@@ -97,10 +84,14 @@ namespace NFCTalk
         /// </summary>
         private void UnableToConnect()
         {
+            _dataContext.Communication.Stop();
+
             Dispatcher.BeginInvoke(() =>
             {
                 HideProgress();
             });
+
+            NavigationService.GoBack();
         }
 
         /// <summary>
@@ -123,6 +114,17 @@ namespace NFCTalk
             _progressIndicator.IsVisible = false;
 
             SystemTray.SetProgressIndicator(this, _progressIndicator);
+        }
+
+        private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            PeerInformation peerInformation = PeersListBox.SelectedItem as PeerInformation;
+
+            if (peerInformation != null)
+            {
+                _dataContext.Communication.Connect(peerInformation);
+                //_dataContext.PeerInformation = peerInformation;
+            }
         }
     }
 }

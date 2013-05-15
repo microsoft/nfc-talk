@@ -1,19 +1,12 @@
-﻿using System;
+﻿using Microsoft.Phone.Controls;
+using Microsoft.Phone.Shell;
+using Microsoft.Phone.Tasks;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Microsoft.Phone.Controls;
-using Microsoft.Phone.Shell;
-using NFCTalk.Resources;
-using Microsoft.Phone.Tasks;
+using Windows.Networking.Proximity;
 
 namespace NFCTalk
 {
@@ -27,20 +20,23 @@ namespace NFCTalk
     {
         private NFCTalk.DataContext _dataContext = NFCTalk.DataContext.Singleton;
         private ApplicationBarIconButton _settingsButton;
+        private ApplicationBarIconButton _browseButton;
+        private ApplicationBarMenuItem _aboutMenuItem = new ApplicationBarMenuItem();
         private ProgressIndicator _progressIndicator = new ProgressIndicator();
 
         public MainPage()
         {
             InitializeComponent();
 
-            ApplicationBarMenuItem menuItem = new ApplicationBarMenuItem();
-            menuItem.Text = "about";
-            ApplicationBar.MenuItems.Add(menuItem);
-            menuItem.Click += new EventHandler(aboutMenuItem_Click);
+            _aboutMenuItem.Text = "about";
+            _aboutMenuItem.Click += new EventHandler(AboutMenuItem_Click);
+
+            ApplicationBar.MenuItems.Add(_aboutMenuItem);
 
             DataContext = _dataContext;
 
             _settingsButton = ApplicationBar.Buttons[0] as ApplicationBarIconButton;
+            _browseButton = ApplicationBar.Buttons[1] as ApplicationBarIconButton;
 
             _progressIndicator.IsIndeterminate = true;
         }
@@ -51,38 +47,75 @@ namespace NFCTalk
         /// </summary>
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
-            if (_dataContext.Settings.Name.Length == 0)
+            base.OnNavigatedTo(e);
+
+            _dataContext.Communication.Connected += Connected;
+            _dataContext.Communication.Connecting += Connecting;
+            _dataContext.Communication.UnableToConnect += UnableToConnect;
+            _dataContext.Communication.Searching += Searching;
+            _dataContext.Communication.SearchFinished += SearchFinished;
+
+            if (_dataContext.PeerInformation != null)
             {
-                NavigationService.Navigate(new Uri("/SettingsPage.xaml", UriKind.Relative));
+                _dataContext.Communication.Connect(_dataContext.PeerInformation);
+
+                _dataContext.PeerInformation = null;
             }
             else
             {
-                _dataContext.Communication.Connected += Connected;
-                _dataContext.Communication.Connecting += Connecting;
-                _dataContext.Communication.ConnectionInterrupted += ConnectionInterrupted;
-                _dataContext.Communication.UnableToConnect += UnableToConnect;
-                _dataContext.Communication.Connect();
-
                 _settingsButton.IsEnabled = true;
+                _browseButton.IsEnabled = true;
+                _aboutMenuItem.IsEnabled = true;
             }
+        }
 
-            base.OnNavigatedTo(e);
+        protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
+        {
+            base.OnNavigatingFrom(e);
+
+            _dataContext.Communication.Connected -= Connected;
+            _dataContext.Communication.Connecting -= Connecting;
+            _dataContext.Communication.UnableToConnect -= UnableToConnect;
+            _dataContext.Communication.Searching -= Searching;
+            _dataContext.Communication.SearchFinished -= SearchFinished;
+        }
+
+        private void SearchFinished()
+        {
+            HideProgress();
+
+            IReadOnlyList<PeerInformation> peers = _dataContext.Communication.Peers;
+
+            if (peers != null && peers.Count > 0)
+            {
+                NavigationService.Navigate(new Uri("/PeersPage.xaml", UriKind.Relative));
+            }
+            else
+            {
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    MessageBoxResult r = MessageBox.Show("To be able to connect, please make sure that the other device is running NFC Talk.", "No peers found", MessageBoxButton.OK);
+
+                    _settingsButton.IsEnabled = true;
+                    _browseButton.IsEnabled = true;
+                    _aboutMenuItem.IsEnabled = true;
+                });
+            }
         }
 
         /// <summary>
-        /// Listening to tap events is stopped when navigating away from MainPage as
-        /// we don't want to allow connecting while in SettingsPage or AboutPage, or while
-        /// a connection is already established.
+        /// Event handler to execute when connection is being made.
         /// </summary>
-        /// <param name="e"></param>
-        protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
+        private void Connecting()
         {
-            _dataContext.Communication.Connected -= Connected;
-            _dataContext.Communication.Connecting -= Connecting;
-            _dataContext.Communication.ConnectionInterrupted -= ConnectionInterrupted;
-            _dataContext.Communication.UnableToConnect -= UnableToConnect;
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
+                ShowProgress("Connecting...");
 
-            base.OnNavigatingFrom(e);
+                _settingsButton.IsEnabled = false;
+                _browseButton.IsEnabled = false;
+                _aboutMenuItem.IsEnabled = false;
+            });
         }
 
         /// <summary>
@@ -101,61 +134,34 @@ namespace NFCTalk
         }
 
         /// <summary>
-        /// Event handler to execute when connection is being made.
-        /// </summary>
-        private void Connecting()
-        {
-            Deployment.Current.Dispatcher.BeginInvoke(() =>
-            {
-                ShowProgress("Connecting...");
-
-                _settingsButton.IsEnabled = false;
-            });
-        }
-
-        /// <summary>
-        /// Event handler to execute when connection is interrupted.
-        /// 
-        /// Attempting to connect is restarted.
-        /// </summary>
-        private void ConnectionInterrupted()
-        {
-            _dataContext.Communication.Disconnect();
-            _dataContext.Communication.Connect();
-
-            Deployment.Current.Dispatcher.BeginInvoke(() =>
-            {
-                HideProgress();
-
-                _settingsButton.IsEnabled = true;
-            });
-        }
-
-        /// <summary>
         /// Event handler to execute when attempting to connect fails.
         /// 
         /// Dialog asking to verify that a secondary bearer is available is displayed.
         /// </summary>
         private void UnableToConnect()
         {
-            _dataContext.Communication.Disconnect();
-
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
                 HideProgress();
 
-                MessageBoxResult r = MessageBox.Show("Please make sure that Bluetooth has been turned on.", "Unable to connect", MessageBoxButton.OKCancel);
+                _settingsButton.IsEnabled = true;
+                _browseButton.IsEnabled = true;
+                _aboutMenuItem.IsEnabled = true;
+            });
+        }
 
-                if (r.HasFlag(MessageBoxResult.OK))
-                {
-                    ConnectionSettingsTask connectionSettingsTask = new ConnectionSettingsTask();
-                    connectionSettingsTask.ConnectionSettingsType = ConnectionSettingsType.Bluetooth;
-                    connectionSettingsTask.Show();
-                }
-                else
-                {
-                    _dataContext.Communication.Connect();
-                }
+        /// <summary>
+        /// Event handler to execute when peers are being searched.
+        /// </summary>
+        private void Searching()
+        {
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
+                ShowProgress("Searching...");
+
+                _settingsButton.IsEnabled = false;
+                _browseButton.IsEnabled = false;
+                _aboutMenuItem.IsEnabled = false;
             });
         }
 
@@ -186,11 +192,19 @@ namespace NFCTalk
         /// 
         /// Attempting to connect is stopped and application navigates to SettingsPage.
         /// </summary>
-        private void settingsButton_Click(object sender, EventArgs e)
+        private void SettingsButton_Click(object sender, EventArgs e)
         {
-            _dataContext.Communication.Disconnect();
-
             NavigationService.Navigate(new Uri("/SettingsPage.xaml", UriKind.Relative));
+        }
+
+        /// <summary>
+        /// Event handler to execute when browse button has been clicked.
+        /// 
+        /// Attempts to search for nearby devices over Bluetooth.
+        /// </summary>
+        private void BrowseButton_Click(object sender, EventArgs e)
+        {
+            _dataContext.Communication.Search();
         }
 
         /// <summary>
@@ -198,10 +212,8 @@ namespace NFCTalk
         /// 
         /// Attempting to connect is stopped and application navigates to AboutPage.
         /// </summary>
-        private void aboutMenuItem_Click(object sender, EventArgs e)
+        private void AboutMenuItem_Click(object sender, EventArgs e)
         {
-            _dataContext.Communication.Disconnect();
-
             NavigationService.Navigate(new Uri("/AboutPage.xaml", UriKind.Relative));
         }
     }

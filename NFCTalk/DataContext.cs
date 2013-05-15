@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright © 2012 Nokia Corporation. All rights reserved.
+ * Copyright © 2012-2013 Nokia Corporation. All rights reserved.
  * Nokia and Nokia Connecting People are registered trademarks of Nokia Corporation. 
  * Other product and company names mentioned herein may be trademarks
  * or trade names of their respective owners. 
@@ -9,6 +9,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.IO.IsolatedStorage;
+using Windows.Networking.Proximity;
 
 namespace NFCTalk
 {
@@ -22,6 +23,7 @@ namespace NFCTalk
         private Settings _settings = null;
         private ObservableCollection<Message> _messages = null;
         private Communication _communication = null;
+        private PeerInformation _peerInformation = null;
 
         /// <summary>
         /// DataContext singleton instance.
@@ -31,9 +33,27 @@ namespace NFCTalk
             get
             {
                 if (_singleton == null)
+                {
                     _singleton = new NFCTalk.DataContext();
+                }
 
                 return _singleton;
+            }
+        }
+
+        public PeerInformation PeerInformation
+        {
+            get
+            {
+                return _peerInformation;
+            }
+
+            set
+            {
+                if (_peerInformation != value)
+                {
+                    _peerInformation = value;
+                }
             }
         }
 
@@ -75,7 +95,9 @@ namespace NFCTalk
             get
             {
                 if (_settings == null)
+                {
                     _settings = new Settings();
+                }
 
                 return _settings;
             }
@@ -89,7 +111,9 @@ namespace NFCTalk
             get
             {
                 if (_messages == null)
+                {
                     _messages = new ObservableCollection<Message>();
+                }
 
                 return _messages;
             }
@@ -103,7 +127,9 @@ namespace NFCTalk
             get
             {
                 if (_communication == null)
+                {
                     _communication = new Communication();
+                }
 
                 return _communication;
             }

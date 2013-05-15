@@ -23,7 +23,14 @@ namespace NFCTalk
         {
             get
             {
-                return _name;
+                if (_name.Length > 0)
+                {
+                    return _name;
+                }
+                else
+                {
+                    return "Anonymous";
+                }
             }
 
             set

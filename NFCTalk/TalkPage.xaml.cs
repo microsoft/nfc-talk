@@ -1,4 +1,12 @@
-﻿using Microsoft.Phone.Controls;
+﻿/*
+ * Copyright © 2012-2013 Nokia Corporation. All rights reserved.
+ * Nokia and Nokia Connecting People are registered trademarks of Nokia Corporation. 
+ * Other product and company names mentioned herein may be trademarks
+ * or trade names of their respective owners. 
+ * See LICENSE.TXT for license information.
+ */
+
+using Microsoft.Phone.Controls;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -24,9 +32,9 @@ namespace NFCTalk
 
         public TalkPage()
         {
-            DataContext = _dataContext;
-            
             InitializeComponent();
+
+            DataContext = _dataContext;
         }
 
         /// <summary>
@@ -36,6 +44,8 @@ namespace NFCTalk
         /// <param name="e"></param>
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
+            base.OnNavigatedTo(e);
+
             sendButton.IsEnabled = false;
 
             _dataContext.Communication.ConnectionInterrupted += ConnectionInterrupted;
@@ -55,6 +65,8 @@ namespace NFCTalk
         /// </summary>
         protected override void OnNavigatingFrom(System.Windows.Navigation.NavigatingCancelEventArgs e)
         {
+            base.OnNavigatingFrom(e);
+
             _dataContext.Communication.ConnectionInterrupted -= ConnectionInterrupted;
             _dataContext.Communication.MessageReceived -= MessageReceived;
 
@@ -66,8 +78,6 @@ namespace NFCTalk
             {
                 m.Archived = true;
             }
-
-            base.OnNavigatingFrom(e);
         }
 
         /// <summary>
@@ -103,12 +113,10 @@ namespace NFCTalk
         /// </summary>
         private void ConnectionInterrupted()
         {
-            _dataContext.Communication.Disconnect();
-
-            Deployment.Current.Dispatcher.BeginInvoke(() =>
-            {
-                NavigationService.GoBack();
-            });
+            Dispatcher.BeginInvoke(() =>
+                {
+                    NavigationService.GoBack();
+                });
         }
 
         /// <summary>

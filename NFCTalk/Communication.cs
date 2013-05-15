@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright © 2012 Nokia Corporation. All rights reserved.
+ * Copyright © 2012-2013 Nokia Corporation. All rights reserved.
  * Nokia and Nokia Connecting People are registered trademarks of Nokia Corporation. 
  * Other product and company names mentioned herein may be trademarks
  * or trade names of their respective owners. 
@@ -7,6 +7,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
@@ -29,6 +30,8 @@ namespace NFCTalk
         public Action UnableToConnect;
         public Action ConnectionInterrupted;
         public Action<Message> MessageReceived;
+        public Action Searching;
+        public Action SearchFinished;
 
         private enum ConnectionStatusValue
         {
@@ -44,6 +47,7 @@ namespace NFCTalk
         private DataWriter _writer;
         private DataReader _reader;
         private string _name;
+        private IReadOnlyList<PeerInformation> _peers;
 
         /// <summary>
         /// Chat name of the other device.
@@ -55,7 +59,7 @@ namespace NFCTalk
                 return _name;
             }
 
-            set
+            private set
             {
                 if (_name != value)
                 {
@@ -72,6 +76,30 @@ namespace NFCTalk
             }
         }
 
+        public IReadOnlyList<PeerInformation> Peers
+        {
+            get
+            {
+                return _peers;
+            }
+
+            private set
+            {
+                if (_peers != value)
+                {
+                    _peers = value;
+
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                    {
+                        if (PropertyChanged != null)
+                        {
+                            PropertyChanged(this, new PropertyChangedEventArgs("Peers"));
+                        }
+                    });
+                }
+            }
+        }
+
         /// <summary>
         /// Start listening to tap events and attempt to connect if such occurs.
         /// 
@@ -81,7 +109,7 @@ namespace NFCTalk
         /// ConnectionInterrupted action will be invoked if connection to another device breaks.
         /// MessageReceived action will be invoked when a message from another device has been received.
         /// </summary>
-        public void Connect()
+        public void Start()
         {
             if (_status == ConnectionStatusValue.NotConnected)
             {
@@ -91,19 +119,20 @@ namespace NFCTalk
 
                 PeerFinder.DisplayName = NFCTalk.DataContext.Singleton.Settings.Name;
                 PeerFinder.TriggeredConnectionStateChanged += TriggeredConnectionStateChanged;
+                PeerFinder.ConnectionRequested += ConnectionRequested;
 
                 PeerFinder.Start();
             }
             else
             {
-                throw new Exception("Bad state, please disconnect first");
+                throw new Exception("Bad state, please stop first");
             }
         }
 
         /// <summary>
         /// Disconnect currently active session and/or stop listening to tap events.
         /// </summary>
-        public void Disconnect()
+        public void Stop()
         {
             switch (_status)
             {
@@ -113,6 +142,8 @@ namespace NFCTalk
                     {
                         PeerFinder.Stop();
                         PeerFinder.TriggeredConnectionStateChanged -= TriggeredConnectionStateChanged;
+                        PeerFinder.ConnectionRequested -= ConnectionRequested;
+
                         _status = ConnectionStatusValue.NotConnected;
                     }
                     break;
@@ -122,11 +153,114 @@ namespace NFCTalk
                         if (_socket != null)
                         {
                             _socket.Dispose();
+                            _socket = null;
                         }
 
                         _status = ConnectionStatusValue.NotConnected;
                     }
                     break;
+            }
+        }
+
+        public void Disconnect()
+        {
+            if (_status == ConnectionStatusValue.Connected)
+            {
+                if (_socket != null)
+                {
+                    _socket.Dispose();
+                    _socket = null;
+                }
+
+                PeerFinder.TriggeredConnectionStateChanged += TriggeredConnectionStateChanged;
+                PeerFinder.ConnectionRequested += ConnectionRequested;
+
+                _status = ConnectionStatusValue.Searching;
+            }
+        }
+
+        public async void Search()
+        {
+            if (_status == ConnectionStatusValue.Searching)
+            {
+                Peers = null;
+
+                try
+                {
+                    if (Searching != null)
+                    {
+                        Searching();
+                    }
+
+                    Peers = await PeerFinder.FindAllPeersAsync();
+
+                    if (SearchFinished != null)
+                    {
+                        SearchFinished();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (UnableToConnect != null)
+                    {
+                        UnableToConnect();
+                    }
+                }
+            }
+            else
+            {
+                throw new Exception("Bad state, please start first");
+            }
+        }
+
+        public async void Connect(PeerInformation peer)
+        {
+            _status = ConnectionStatusValue.Connecting;
+
+            try
+            {
+                if (Connecting != null)
+                {
+                    Connecting();
+                }
+
+                _socket = await PeerFinder.ConnectAsync(peer);
+
+                if (_socket != null)
+                {
+                    PeerFinder.TriggeredConnectionStateChanged -= TriggeredConnectionStateChanged;
+                    PeerFinder.ConnectionRequested -= ConnectionRequested;
+
+                    _status = ConnectionStatusValue.Connected;
+
+                    _writer = new DataWriter(_socket.OutputStream);
+                    _writer.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8;
+                    _writer.ByteOrder = Windows.Storage.Streams.ByteOrder.LittleEndian;
+
+                    _reader = new DataReader(_socket.InputStream);
+                    _reader.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8;
+                    _reader.ByteOrder = Windows.Storage.Streams.ByteOrder.LittleEndian;
+
+                    ListenAsync();
+
+                    SendNameAsync(NFCTalk.DataContext.Singleton.Settings.Name);
+
+                    if (Connected != null)
+                    {
+                        Connected();
+                    }
+                }
+                else if (UnableToConnect != null)
+                {
+                    UnableToConnect();
+                }
+            }
+            catch (Exception ex)
+            {
+                if (UnableToConnect != null)
+                {
+                    UnableToConnect();
+                }
             }
         }
 
@@ -160,21 +294,21 @@ namespace NFCTalk
 
                 case TriggeredConnectState.Completed: System.Diagnostics.Debug.WriteLine("Completed");
                     {
-                        PeerFinder.Stop();
                         PeerFinder.TriggeredConnectionStateChanged -= TriggeredConnectionStateChanged;
-
+                        PeerFinder.ConnectionRequested -= ConnectionRequested;
+                        
                         _socket = e.Socket;
 
-                        _writer = new DataWriter(e.Socket.OutputStream);
+                        _writer = new DataWriter(_socket.OutputStream);
                         _writer.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8;
                         _writer.ByteOrder = Windows.Storage.Streams.ByteOrder.LittleEndian;
 
-                        _reader = new DataReader(e.Socket.InputStream);
+                        _reader = new DataReader(_socket.InputStream);
                         _reader.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8;
                         _reader.ByteOrder = Windows.Storage.Streams.ByteOrder.LittleEndian;
 
                         _status = ConnectionStatusValue.Connected;
-
+                        
                         ListenAsync();
 
                         SendNameAsync(NFCTalk.DataContext.Singleton.Settings.Name);
@@ -203,6 +337,43 @@ namespace NFCTalk
                         }
                     }
                     break;
+            }
+        }
+
+        private async void ConnectionRequested(object sender, ConnectionRequestedEventArgs e)
+        {
+            try
+            {
+                _socket = await PeerFinder.ConnectAsync(e.PeerInformation);
+
+                PeerFinder.TriggeredConnectionStateChanged -= TriggeredConnectionStateChanged;
+                PeerFinder.ConnectionRequested -= ConnectionRequested;
+
+                _writer = new DataWriter(_socket.OutputStream);
+                _writer.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8;
+                _writer.ByteOrder = Windows.Storage.Streams.ByteOrder.LittleEndian;
+
+                _reader = new DataReader(_socket.InputStream);
+                _reader.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8;
+                _reader.ByteOrder = Windows.Storage.Streams.ByteOrder.LittleEndian;
+
+                _status = ConnectionStatusValue.Connected;
+
+                ListenAsync();
+
+                SendNameAsync(NFCTalk.DataContext.Singleton.Settings.Name);
+
+                if (Connected != null)
+                {
+                    Connected();
+                }
+            }
+            catch (Exception ex)
+            {
+                if (UnableToConnect != null)
+                {
+                    UnableToConnect();
+                }
             }
         }
 
@@ -344,7 +515,7 @@ namespace NFCTalk
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 if (ConnectionInterrupted != null)
                 {

@@ -1,5 +1,5 @@
 ﻿<!--
- Copyright © 2012 Nokia Corporation. All rights reserved.
+ Copyright © 2012-2013 Nokia Corporation. All rights reserved.
  Nokia and Nokia Connecting People are registered trademarks of Nokia Corporation. 
  Other product and company names mentioned herein may be trademarks
  or trade names of their respective owners. 
@@ -30,7 +30,7 @@
         </Grid.RowDefinitions>
 
         <StackPanel x:Name="TitlePanel" Grid.Row="0" Margin="12,17,0,28">
-            <TextBlock Text="NFC TALK - CONNECTED" Style="{StaticResource PhoneTextNormalStyle}"/>
+            <TextBlock Text="NFC TALK" Style="{StaticResource PhoneTextNormalStyle}"/>
             <TextBlock Text="{Binding Communication.PeerName}" Style="{StaticResource PhoneTextTitle1Style}" Margin="9,-7,0,0"/>
         </StackPanel>
         
@@ -39,47 +39,47 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            
-            <ListBox x:Name="talkListBox" ItemsSource="{Binding Messages}">
+
+            <ListBox x:Name="talkListBox" ItemsSource="{Binding Messages}" Margin="12,0,12,0">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <local:TalkTemplateSelector Content="{Binding}">
                             <local:TalkTemplateSelector.OutBoundTemplate>
                                 <DataTemplate>
-                                    <StackPanel Width="460">
+                                    <StackPanel Width="436">
                                         <StackPanel Background="#3366FF" MinWidth="160" MaxWidth="420" Margin="0,0,0,18" HorizontalAlignment="Left">
-                                            <TextBlock Text="{Binding Name}" Margin="12,12,12,0" Style="{StaticResource PhoneTextSmallStyle}"/>
-                                            <TextBlock Text="{Binding Text}" Margin="12,6,12,12" Style="{StaticResource PhoneTextNormalStyle}" TextWrapping="Wrap"/>
+                                            <TextBlock Text="{Binding Name}" Margin="12,12,12,0" Style="{StaticResource PhoneTextSmallStyle}" Foreground="White"/>
+                                            <TextBlock Text="{Binding Text}" Margin="12,6,12,12" Style="{StaticResource PhoneTextNormalStyle}" TextWrapping="Wrap" Foreground="White"/>
                                         </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>
                             </local:TalkTemplateSelector.OutBoundTemplate>
                             <local:TalkTemplateSelector.InBoundTemplate>
                                 <DataTemplate>
-                                    <StackPanel Width="460">
+                                    <StackPanel Width="436">
                                         <StackPanel Background="#0033CC" MinWidth="160" MaxWidth="420" Margin="0,0,0,18" HorizontalAlignment="Right">
-                                            <TextBlock Text="{Binding Name}" Margin="12,12,12,0" Style="{StaticResource PhoneTextSmallStyle}" HorizontalAlignment="Right"/>
-                                            <TextBlock Text="{Binding Text}" Margin="12,6,12,12" Style="{StaticResource PhoneTextNormalStyle}" TextWrapping="Wrap" HorizontalAlignment="Right"/>
+                                            <TextBlock Text="{Binding Name}" Margin="12,12,12,0" Style="{StaticResource PhoneTextSmallStyle}" HorizontalAlignment="Right" Foreground="White"/>
+                                            <TextBlock Text="{Binding Text}" Margin="12,6,12,12" Style="{StaticResource PhoneTextNormalStyle}" TextWrapping="Wrap" HorizontalAlignment="Right" Foreground="White"/>
                                         </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>
                             </local:TalkTemplateSelector.InBoundTemplate>
                             <local:TalkTemplateSelector.OutBoundArchivedTemplate>
                                 <DataTemplate>
-                                    <StackPanel Width="460">
+                                    <StackPanel Width="436">
                                         <StackPanel Background="#828282" MinWidth="160" MaxWidth="420" Margin="0,0,0,18" HorizontalAlignment="Left">
-                                            <TextBlock Text="{Binding Name}" Margin="12,12,12,0" Style="{StaticResource PhoneTextSmallStyle}"/>
-                                            <TextBlock Text="{Binding Text}" Margin="12,6,12,12" Style="{StaticResource PhoneTextNormalStyle}" TextWrapping="Wrap"/>
+                                            <TextBlock Text="{Binding Name}" Margin="12,12,12,0" Style="{StaticResource PhoneTextSmallStyle}" Foreground="White"/>
+                                            <TextBlock Text="{Binding Text}" Margin="12,6,12,12" Style="{StaticResource PhoneTextNormalStyle}" TextWrapping="Wrap" Foreground="White"/>
                                         </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>
                             </local:TalkTemplateSelector.OutBoundArchivedTemplate>
                             <local:TalkTemplateSelector.InBoundArchivedTemplate>
                                 <DataTemplate>
-                                    <StackPanel Width="460">
+                                    <StackPanel Width="436">
                                         <StackPanel Background="#474747" MinWidth="160" MaxWidth="420" Margin="0,0,0,18" HorizontalAlignment="Right">
-                                            <TextBlock Text="{Binding Name}" Margin="12,12,12,0" Style="{StaticResource PhoneTextSmallStyle}" HorizontalAlignment="Right"/>
-                                            <TextBlock Text="{Binding Text}" Margin="12,6,12,12" Style="{StaticResource PhoneTextNormalStyle}" TextWrapping="Wrap" HorizontalAlignment="Right"/>
+                                            <TextBlock Text="{Binding Name}" Margin="12,12,12,0" Style="{StaticResource PhoneTextSmallStyle}" HorizontalAlignment="Right" Foreground="White"/>
+                                            <TextBlock Text="{Binding Text}" Margin="12,6,12,12" Style="{StaticResource PhoneTextNormalStyle}" TextWrapping="Wrap" HorizontalAlignment="Right" Foreground="White"/>
                                         </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>
