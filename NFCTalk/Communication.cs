@@ -61,6 +61,28 @@ namespace NFCTalk
         }
 
         /// <summary>
+        /// Connection status.
+        /// </summary>
+        public bool SupportsTriggeredDiscovery
+        {
+            get
+            {
+                return PeerFinder.SupportedDiscoveryTypes.HasFlag(PeerDiscoveryTypes.Triggered);
+            }
+        }
+
+        /// <summary>
+        /// Connection status.
+        /// </summary>
+        public bool SupportsBrowseDiscovery
+        {
+            get
+            {
+                return PeerFinder.SupportedDiscoveryTypes.HasFlag(PeerDiscoveryTypes.Browse);
+            }
+        }
+
+        /// <summary>
         /// Chat name of the other device.
         /// </summary>
         public string PeerName

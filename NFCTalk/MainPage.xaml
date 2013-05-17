@@ -37,7 +37,7 @@
                 <Image Source="Assets/ConnectGuideWhite.png" Height="300" Width="300" Visibility="{StaticResource PhoneDarkThemeVisibility}"/>
                 <Image Source="Assets/ConnectGuideBlack.png" Height="300" Width="300" Visibility="{StaticResource PhoneLightThemeVisibility}"/>
                 <TextBlock Text="{Binding Path=Settings.Name, StringFormat='Your name is set to \{0\}.'}" HorizontalAlignment="Center"/>
-                <TextBlock Text="Tap other device to connect." HorizontalAlignment="Center" Margin="0,24,0,0"/>
+                <TextBlock x:Name="GuideTextBlock" HorizontalAlignment="Center" Margin="12,24,12,12" TextWrapping="Wrap" TextAlignment="Center"/>
             </StackPanel>
         </Grid>
     </Grid>
@@ -45,7 +45,7 @@
     <phone:PhoneApplicationPage.ApplicationBar>
         <shell:ApplicationBar IsVisible="True">
             <shell:ApplicationBarIconButton Text="settings" IconUri="Assets/Icons/appbar.feature.settings.rest.png" Click="SettingsButton_Click"/>
-            <shell:ApplicationBarIconButton Text="browse" IconUri="Assets/Icons/appbar.feature.search.rest.png" Click="BrowseButton_Click"/>
+            <shell:ApplicationBarIconButton Text="search" IconUri="Assets/Icons/appbar.feature.search.rest.png" Click="BrowseButton_Click"/>
         </shell:ApplicationBar>
     </phone:PhoneApplicationPage.ApplicationBar>
 </phone:PhoneApplicationPage>

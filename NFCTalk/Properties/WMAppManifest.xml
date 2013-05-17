@@ -42,8 +42,5 @@
       <ScreenResolution Name="ID_RESOLUTION_WXGA" />
       <ScreenResolution Name="ID_RESOLUTION_HD720P" />
     </ScreenResolutions>
-    <Requirements>
-      <Requirement Name="ID_REQ_NFC" />
-    </Requirements>
   </App>
 </Deployment>

@@ -39,6 +39,23 @@ namespace NFCTalk
             _browseButton = ApplicationBar.Buttons[1] as ApplicationBarIconButton;
 
             _progressIndicator.IsIndeterminate = true;
+
+            if (_dataContext.Communication.SupportsTriggeredDiscovery && _dataContext.Communication.SupportsBrowseDiscovery)
+            {
+                GuideTextBlock.Text = "Tap other device to connect directly or search for devices running this app and having Bluetooth enabled by clicking on the search icon.";
+            }
+            else if (_dataContext.Communication.SupportsTriggeredDiscovery)
+            {
+                GuideTextBlock.Text = "Tap other device to connect.";
+            }
+            else if (_dataContext.Communication.SupportsBrowseDiscovery)
+            {
+                GuideTextBlock.Text = "Search for devices running this app and having Bluetooth enabled by clicking on the search icon.";
+            }
+            else
+            {
+                GuideTextBlock.Text = "Unfortunately it seems that your device does not support establishing proximity connections.";
+            }
         }
 
         /// <summary>
@@ -64,7 +81,7 @@ namespace NFCTalk
             else
             {
                 _settingsButton.IsEnabled = true;
-                _browseButton.IsEnabled = true;
+                _browseButton.IsEnabled = _dataContext.Communication.SupportsBrowseDiscovery;
                 _aboutMenuItem.IsEnabled = true;
             }
         }
@@ -97,7 +114,7 @@ namespace NFCTalk
                     MessageBoxResult r = MessageBox.Show("To be able to connect, please make sure that the other device is running NFC Talk.", "No peers found", MessageBoxButton.OK);
 
                     _settingsButton.IsEnabled = true;
-                    _browseButton.IsEnabled = true;
+                    _browseButton.IsEnabled = _dataContext.Communication.SupportsBrowseDiscovery;
                     _aboutMenuItem.IsEnabled = true;
                 });
             }
@@ -145,7 +162,7 @@ namespace NFCTalk
                 HideProgress();
 
                 _settingsButton.IsEnabled = true;
-                _browseButton.IsEnabled = true;
+                _browseButton.IsEnabled = _dataContext.Communication.SupportsBrowseDiscovery;
                 _aboutMenuItem.IsEnabled = true;
             });
         }
