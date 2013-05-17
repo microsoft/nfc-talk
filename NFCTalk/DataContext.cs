@@ -66,6 +66,7 @@ namespace NFCTalk
             {
                 IsolatedStorageSettings.ApplicationSettings["Settings"] = _settings;
                 IsolatedStorageSettings.ApplicationSettings["Messages"] = _messages;
+                IsolatedStorageSettings.ApplicationSettings.Save();
             }
             catch (Exception)
             {

@@ -43,6 +43,9 @@ namespace NFCTalk
         {
             _dataContext.Settings.Name = nameInput.Text;
 
+            _dataContext.Communication.Stop();
+            _dataContext.Communication.Start();
+
             NavigationService.GoBack();
         }
 

@@ -60,6 +60,8 @@ namespace NFCTalk
                 PhoneApplicationService.Current.UserIdleDetectionMode = IdleDetectionMode.Disabled;
             }
 
+            _dataContext.Load();
+
             _dataContext.Communication.ConnectivityProblem += ConnectivityProblem;
             _dataContext.Communication.ConnectionInterrupted += ConnectionInterrupted;
         }
@@ -68,7 +70,6 @@ namespace NFCTalk
         // This code will not execute when the application is reactivated
         private void Application_Launching(object sender, LaunchingEventArgs e)
         {
-            _dataContext.Load();
             _dataContext.Communication.Start();
         }
 
