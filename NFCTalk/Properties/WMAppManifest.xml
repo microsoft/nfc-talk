@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Deployment xmlns="http://schemas.microsoft.com/windowsphone/2012/deployment" AppPlatformVersion="8.0">
   <DefaultLanguage xmlns="" code="en-US" />
-  <App xmlns="" ProductID="{d8232dcc-e39e-4b48-8449-45d19adfee7e}" Title="NFC Talk" RuntimeType="Silverlight" Version="1.0.0.0" Genre="apps.normal" Author="Nokia" Description="" Publisher="Nokia" PublisherID="{2eda2bab-152c-4a73-84cb-655d3757786b}">
+  <App xmlns="" ProductID="{d8232dcc-e39e-4b48-8449-45d19adfee7e}" Title="NFC Talk" RuntimeType="Silverlight" Version="1.1.0.0" Genre="apps.normal" Author="Nokia" Description="" Publisher="Nokia" PublisherID="{2eda2bab-152c-4a73-84cb-655d3757786b}">
     <IconPath IsRelative="true" IsResource="false">Assets\ApplicationIcon.png</IconPath>
     <Capabilities>
       <Capability Name="ID_CAP_NETWORKING" />
