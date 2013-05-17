@@ -49,6 +49,9 @@ namespace NFCTalk
         private string _name;
         private IReadOnlyList<PeerInformation> _peers;
 
+        /// <summary>
+        /// Connection status.
+        /// </summary>
         public bool IsConnected
         {
             get
@@ -84,6 +87,9 @@ namespace NFCTalk
             }
         }
 
+        /// <summary>
+        /// Searched peers for the last completed search operation.
+        /// </summary>
         public IReadOnlyList<PeerInformation> Peers
         {
             get
@@ -138,7 +144,7 @@ namespace NFCTalk
         }
 
         /// <summary>
-        /// Disconnect currently active session and/or stop listening to tap events.
+        /// Disconnect currently active connections and/or stop listening to tap events.
         /// </summary>
         public void Stop()
         {
@@ -169,6 +175,9 @@ namespace NFCTalk
             _status = ConnectionStatusValue.Idle;
         }
 
+        /// <summary>
+        /// Disconnect currently active connections and continue listening for new connections.
+        /// </summary>
         public void Disconnect()
         {
             if (_status == ConnectionStatusValue.Connected)
@@ -186,6 +195,13 @@ namespace NFCTalk
             }
         }
 
+        /// <summary>
+        /// Search for nearby devices running NFC Talk. Uses Bluetooth.
+        /// 
+        /// Searching action will be invoked when search is started.
+        /// SearchFinished action will be invoked when search has finished. Found peers can be accessed via the Peers property.
+        /// ConnectivityProblem action will be invoked if search fails.
+        /// </summary>
         public async void Search()
         {
             if (_status != ConnectionStatusValue.Idle)
@@ -220,6 +236,16 @@ namespace NFCTalk
             }
         }
 
+        /// <summary>
+        /// Connect to detected remote device.
+        /// 
+        /// Connecting action will be invoked when a socket connection is being created.
+        /// Connected action will be invoked when a connection with another device has been established.
+        /// ConnectivityProblem action will be invoked if connection to another device cannot be made.
+        /// ConnectionInterrupted action will be invoked if connection to another device breaks.
+        /// MessageReceived action will be invoked when a message from another device has been received.
+        /// <param name="peer">Peer to connect to</param>
+        /// </summary>
         public async void Connect(PeerInformation peer)
         {
             _status = ConnectionStatusValue.Connecting;
@@ -272,7 +298,7 @@ namespace NFCTalk
         }
 
         /// <summary>
-        /// Event handler to be executed when PeerFinder's TriggeredConnectionStateChanged changes.
+        /// Event handler to be executed when PeerFinder's TriggeredConnectionStateChanged fires.
         /// </summary>
         private void TriggeredConnectionStateChanged(object sender, TriggeredConnectionStateChangedEventArgs e)
         {
@@ -347,6 +373,9 @@ namespace NFCTalk
             }
         }
 
+        /// <summary>
+        /// Event handler to be executed when PeerFinder's ConnectionRequested fires.
+        /// </summary>
         private async void ConnectionRequested(object sender, ConnectionRequestedEventArgs e)
         {
             try
