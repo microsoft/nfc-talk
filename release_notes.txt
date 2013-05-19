@@ -2,8 +2,9 @@ NFC Talk
 ========
 
 NFC Talk application demonstrates connection initiation by tapping devices
-together, using the Windows Phone 8 Proximity API, the
-Windows.Networking.Proximity.PeerFinder and the related classes.
+together or by searching for nearby devices over Bluetooth, using the
+Windows Phone 8 Proximity API, the Windows.Networking.Proximity.PeerFinder
+and related classes.
 
 The example has been developed with Silverlight for Windows Phone devices
 and tested to work on Nokia Lumia devices with Windows Phone 8.
@@ -19,6 +20,7 @@ What's new
 ----------
 
 Version 1.0.0.0: First release of the NFC Talk
+Version 1.1.0.0: Peer browsing support (also for NFC-less devices)
 
 
 1. Usage
@@ -66,6 +68,12 @@ trying out the application.
 | TalkPage.xaml(.cs)             | The page that is used to chat with peer.   |
 |                                |                                            |
 |--------------------------------|--------------------------------------------|
+| SettingsPage.cs                | The page that is used to configure chat    |
+|                                | name.                                      |
+|--------------------------------|--------------------------------------------|
+| PeersPage.cs                   | The page that is used to show a list of    |
+|                                | detected remote peers.                     |
+|--------------------------------|--------------------------------------------|
 | Communication.cs               | Class that encapsulates the usage of the   |
 |                                | Proximity API.                             |
 |--------------------------------|--------------------------------------------|
@@ -84,8 +92,8 @@ using Windows.Storage.Streams;
 
 - Windows Phone 8
 
-Tested to work on Nokia Lumia 820 and Nokia Lumia 920. 
-Developed with Microsoft Visual Studio Express for Windows Phone 2012.
+Tested to work on Nokia Lumia 520, Nokia Lumia 620, Nokia Lumia 820 and Nokia
+Lumia 920. Developed with Microsoft Visual Studio Express for Windows Phone 2012.
 
 
 4.1 Required Capabilities
@@ -146,3 +154,4 @@ describes the usage of Proximity API to open sockets to peer devices in more det
 -------------------------------------------------------------------------------
 
 1.0.0.0 First release.
+1.1.0.0 Peer browsing support (also for NFC-less devices).
