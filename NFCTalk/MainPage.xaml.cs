@@ -42,7 +42,7 @@ namespace NFCTalk
 
             if (_dataContext.Communication.SupportsTriggeredDiscovery && _dataContext.Communication.SupportsBrowseDiscovery)
             {
-                GuideTextBlock.Text = "Tap other device to connect directly or search for devices running this app and having Bluetooth enabled by clicking on the search icon.";
+                GuideTextBlock.Text = "Tap other device to connect directly or search for devices running this app and having Bluetooth enabled by clicking on the search icon. For tap to work, tap+send has to be turned on in the phone settings.";
             }
             else if (_dataContext.Communication.SupportsTriggeredDiscovery)
             {
