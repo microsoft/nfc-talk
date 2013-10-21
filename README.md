@@ -41,40 +41,22 @@ http://msdn.microsoft.com/en-us/library/gg588378%28v=vs.92%29.aspx
 2. Implementation
 --------------------------------------------------------------------------------
 
-**Folders:**
-
- |                  The root folder contains the project file, the license 
- |                  information and this file (release_notes.txt).
- |
- |- NFCTalk         Root folder for the implementation files.  
- |  |
- |  |- Assets       Graphic assets like icons and tiles.
- |  |
- |  |- Properties   Application property files.
- |  |
- |  |- Resources    Application resources.
-
-
 **Important files and classes:**
 
-| File                           | Description                                |
-|--------------------------------|--------------------------------------------|
-| MainPage.xaml(.cs)             | The main page of the application.          |
-|                                |                                            |
-|--------------------------------|--------------------------------------------|
-| TalkPage.xaml(.cs)             | The page that is used to chat with peer.   |
-|                                |                                            |
-|--------------------------------|--------------------------------------------|
-| SettingsPage.cs                | The page that is used to configure chat    |
-|                                | name.                                      |
-|--------------------------------|--------------------------------------------|
-| PeersPage.cs                   | The page that is used to show a list of    |
-|                                | detected remote peers.                     |
-|--------------------------------|--------------------------------------------|
-| Communication.cs               | Class that encapsulates the usage of the   |
-|                                | Proximity API.                             |
-|--------------------------------|--------------------------------------------|
+-------------------- -----------------------------------------------------------
+File                 Description                           
+-------------------- -----------------------------------------------------------
+`MainPage.xaml(.cs)` The main page of the application.
 
+`TalkPage.xaml(.cs)` The page that is used to chat with peer.
+
+`SettingsPage.cs`    The page that is used to configure chat name.
+
+`PeersPage.cs`       The page that is used to show a list of detected remote
+                     peers.
+
+`Communication.cs`   Class that encapsulates the usage of the Proximity API.
+-------------------- -----------------------------------------------------------
 
 **Required capabilities:**
 
