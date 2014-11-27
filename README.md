@@ -10,7 +10,7 @@ The example has been developed with XAML for Windows Phone devices and tested to
 work on Nokia Lumia devices with Windows Phone 8.
 
 This example application is hosted in GitHub:
-https://github.com/nokia-developer/nfc-talk
+https://github.com/Microsoft/nfc-talk
 
 For more information on implementation and porting, visit Nokia Lumia
 Developer's Library:
@@ -68,7 +68,7 @@ File                 Description
 --------------------------------------------------------------------------------
 
 See the license text file delivered with this project. The license file is also
-available online at https://github.com/nokia-developer/nfc-talk/blob/master/Licence.txt
+available online at https://github.com/Microsoft/nfc-talk/blob/master/Licence.txt
 
 
 4. Version history
