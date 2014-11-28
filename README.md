@@ -6,14 +6,16 @@ together or by searching for nearby devices over Bluetooth, using the
 Windows Phone 8 Proximity API, the Windows.Networking.Proximity.PeerFinder
 and related classes.
 
+![Screenshot 1](/doc/nfc_talk_ss_tap_small.png?raw=true)&nbsp;
+![Screenshot 2](/doc/nfc_talk_ss_chat_small.png?raw=true)
+
 The example has been developed with XAML for Windows Phone devices and tested to
-work on Nokia Lumia devices with Windows Phone 8.
+work on Lumia devices with Windows Phone 8.
 
 This example application is hosted in GitHub:
 https://github.com/Microsoft/nfc-talk
 
-For more information on implementation and porting, visit Nokia Lumia
-Developer's Library:
+For more information on implementation and porting, visit Lumia Developer's Library:
 http://developer.nokia.com/Resources/Library/Lumia/#!code-examples/nfc-talk.html
 
 
