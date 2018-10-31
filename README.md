@@ -1,5 +1,4 @@
-NFC Talk
-========
+# NFC Talk
 
 NFC Talk application demonstrates connection initiation by tapping devices
 together or by searching for nearby devices over Bluetooth, using the
@@ -19,8 +18,8 @@ For more information on implementation and porting, visit Lumia Developer's Libr
 http://developer.nokia.com/Resources/Library/Lumia/#!code-examples/nfc-talk.html
 
 
-1. Instructions
---------------------------------------------------------------------------------
+## 1. Instructions
+
 
 This is a simple build-and-run solution. Learn about Proximity API usage for
 opening communication channels to application instances on other devices by
@@ -40,8 +39,7 @@ deploying and testing applications on Windows Phone devices:
 http://msdn.microsoft.com/en-us/library/gg588378%28v=vs.92%29.aspx
 
 
-2. Implementation
---------------------------------------------------------------------------------
+## 2. Implementation
 
 **Important files and classes:**
 
@@ -66,15 +64,13 @@ File                 Description
 * ID_CAP_PROXIMITY
 
 
-3. License
---------------------------------------------------------------------------------
+## 3. License
 
 See the license text file delivered with this project. The license file is also
 available online at https://github.com/Microsoft/nfc-talk/blob/master/Licence.txt
 
 
-4. Version history
---------------------------------------------------------------------------------
+## 4. Version history
 
 * Version 1.1: Peer browsing support (also for NFC-less devices).
 * Version 1.0: The first release.
