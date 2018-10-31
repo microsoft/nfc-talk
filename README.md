@@ -15,8 +15,6 @@ work on Lumia devices with Windows Phone 8.
 This example application is hosted in GitHub:
 https://github.com/Microsoft/nfc-talk
 
-For more information on implementation and porting, visit Lumia Developer's Library:
-http://developer.nokia.com/Resources/Library/Lumia/#!code-examples/nfc-talk.html
 
 
 1. Instructions
